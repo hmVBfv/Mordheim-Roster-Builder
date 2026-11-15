@@ -414,6 +414,16 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await expect(wealth.getByRole('img').locator('polyline')).toHaveCount(1);
     await noSideScroll(page);
     await shot(page, `${theme}-statistics-wealth`);
+    // two warbands side by side, and the export
+    const compare = page.getByRole('region', { name: 'Compare two warbands' });
+    await compare.scrollIntoViewIfNeeded();
+    await expect(compare.getByRole('row', { name: /Warband rating/ })).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-statistics-compare`);
+    const download = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Download all numbers (CSV)' }).click();
+    expect((await download).suggestedFilename()).toBe('statistics.csv');
   });
 }
 

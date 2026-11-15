@@ -2,10 +2,12 @@
    numbers behind it. Mechanics only, open to every member (ADR 0002). */
 import { useMemo, useState } from 'react';
 import { Sparkline } from '../ui/Sparkline.tsx';
+import { saveFile } from '../ui/files.ts';
 import ui from '../ui/ui.module.css';
+import { Compare } from './Compare.tsx';
 import { BattleStatistics } from './BattleStatistics.tsx';
 import { LineChart } from './LineChart.tsx';
-import { GROUPS, METRICS, fmt, metricOf, seriesOf } from './metrics.ts';
+import { GROUPS, METRICS, fmt, metricOf, seriesOf, toCsv } from './metrics.ts';
 import styles from './Statistics.module.css';
 import { useStatistics } from './useStatistics.ts';
 
@@ -35,8 +37,10 @@ export function StatisticsTab({ id }: { id: string }) {
           <Sparkline key={s.warbandId} title={s.name} unit={metric.unit} points={s.points.map((p) => ({ label: p.label, value: p.value }))} />
         ))}
       </div>
+      <Compare list={list} />
       <BattleStatistics id={id} />
       <p className={ui.muted}>Each number is as it stood at a mark: the start, after each battle, a round sat out. Latest: {series.map((s) => `${s.name} ${fmt(s.points.at(-1)!.value, metric.unit)}`).join(' · ')}.</p>
+      <button type="button" className={`${ui.buttonQuiet} ${styles.export}`} onClick={() => saveFile('statistics.csv', toCsv(list), 'text/csv;charset=utf-8')}>Download all numbers (CSV)</button>
     </div>
   );
 }

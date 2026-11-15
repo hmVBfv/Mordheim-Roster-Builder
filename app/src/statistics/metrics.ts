@@ -73,3 +73,28 @@ export function niceScale(values: number[]): { min: number; max: number; ticks: 
   for (let v = min; v <= max + step / 2; v += step) ticks.push(Math.round(v * 1000) / 1000);
   return { min, max, ticks };
 }
+
+/** The latest value of a number for each warband, for the comparison of two (a warband without the number is left out). */
+export function latestOf(stats: WarbandStatistics[], key: string): Map<string, number> {
+  return new Map(seriesOf(stats, key).map((s) => [s.warbandId, s.points.at(-1)!.value]));
+}
+
+/** One cell of a CSV file: quoted when it holds a separator, a quote or a line break; a leading =, +, - or @ is kept from being read as a formula. */
+const cell = (v: string | number): string => {
+  let s = String(v);
+  if (typeof v === 'string' && /^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
+
+/** Every number of every mark as CSV: one row for each warband and mark, one column for each number. */
+export function toCsv(stats: WarbandStatistics[]): string {
+  const keys = METRICS.map((m) => m.key);
+  const rows: (string | number)[][] = [['warband', 'round', 'mark', ...keys]];
+  for (const w of stats) {
+    for (const p of [...w.points].sort((a, b) => a.round - b.round || a.at.localeCompare(b.at))) {
+      const m = p.metrics as Record<string, unknown>;
+      rows.push([w.name, p.round, markLabel(p.kind, p.round), ...keys.map((k) => (typeof m[k] === 'number' ? (m[k] as number) : ''))]);
+    }
+  }
+  return rows.map((r) => r.map(cell).join(',')).join('\n') + '\n';
+}

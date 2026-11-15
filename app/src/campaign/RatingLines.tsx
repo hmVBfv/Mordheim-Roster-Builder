@@ -1,5 +1,8 @@
 /* The rating over the battles of every warband of a campaign, one small line each (plan P7), and the line of one's own warband on its roster. A line
    needs two marks; with fewer there is nothing to draw and nothing is said. */
+import { useState } from 'react';
+import { GROUPS, METRICS, metricOf, seriesOf } from '../statistics/metrics.ts';
+import { useStatistics } from '../statistics/useStatistics.ts';
 import { Sparkline } from '../ui/Sparkline.tsx';
 import ui from '../ui/ui.module.css';
 import { ratingSeries } from './ratingSeries.ts';
@@ -19,9 +22,28 @@ export function RatingLines({ id }: { id: string }) {
   );
 }
 
-/** The line of one warband of the campaign. */
+/** The line of one warband of the campaign, for the rating or any other number the marks carry (plan P14). */
 export function OwnRatingLine({ campaignId, warbandId }: { campaignId: string; warbandId: string }) {
+  const [key, setKey] = useState('rating');
   const mine = useRatings(campaignId).find((w) => w.warbandId === warbandId);
+  // the other numbers come from the statistics, read only when one is asked for
+  const stats = useStatistics(key === 'rating' ? null : campaignId);
+  const metric = metricOf(key);
+  const own = key === 'rating'
+    ? (mine && mine.points.length >= 2 ? ratingSeries(mine.points) : null)
+    : seriesOf(stats.list, key).find((s) => s.warbandId === warbandId)?.points.map((p) => ({ label: p.label, value: p.value })) ?? null;
   if (!mine || mine.points.length < 2) return null;
-  return <div className={ui.page}><Sparkline title="Rating over the battles" unit="rating" points={ratingSeries(mine.points)} /></div>;
+  return (
+    <div className={ui.page}>
+      <label className={ui.field}>
+        <span>Show over the battles</span>
+        <select className={ui.input} value={key} onChange={(e) => setKey(e.target.value)}>
+          {GROUPS.map((g) => <optgroup key={g} label={g}>{METRICS.filter((m) => m.group === g).map((m) => <option key={m.key} value={m.key}>{m.label}</option>)}</optgroup>)}
+        </select>
+      </label>
+      {own && own.length >= 2
+        ? <Sparkline title={key === 'rating' ? 'Rating over the battles' : `${metric.label} over the battles`} unit={metric.unit || (key === 'rating' ? 'rating' : '')} points={own} />
+        : <p className={ui.muted}>{stats.loaded || key === 'rating' ? 'Not enough marks carry this number yet.' : 'Loading the numbers…'}</p>}
+    </div>
+  );
 }

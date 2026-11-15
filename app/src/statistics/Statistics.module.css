@@ -58,3 +58,13 @@
 .seg { display: grid; place-items: center; min-width: 22px; color: #fff; font-size: 0.8rem; border-radius: 4px; }
 .pair { display: grid; gap: 2px; }
 .line { display: block; min-width: 22px; min-height: 18px; padding: 0 var(--space-1); color: #fff; font-size: 0.8rem; border-radius: 0 4px 4px 0; }
+
+.compare { display: grid; gap: var(--space-2); }
+.pair { display: grid; gap: var(--space-2); grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.tableWrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.table caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.table { font-size: 0.9rem; }
+.table th, .table td { padding: var(--space-1); text-align: right; border-bottom: 1px solid currentColor; }
+.table th[scope='row'], .table thead th:first-child { text-align: left; }
+.export { justify-self: start; }
