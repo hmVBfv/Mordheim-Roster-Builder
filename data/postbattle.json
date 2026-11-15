@@ -64,5 +64,25 @@
   ["4 4 4 4 4 4", "Slaughtered warband", "3D6×5 gc and D6 daggers, and roll for each: D3 light armour 4+ · heavy armour 5+ · Mordheim map 4+ · D3 halberds 5+ · D3 swords 3+ · D3 shields 2+ · D3 bows 4+ · D3 helmets 2+."],
   ["5 5 5 5 5 5", "Fighting arena", "A training manual: sell it for 100 gc, or a Hero studies it — Combat skills from now on, and his WS may rise one point above its racial maximum."],
   ["6 6 6 6 6 6", "Noble's villa", "D6: 1–2 D6×10 gc · 3–4 D6 vials of Crimson Shade · 5–6 a magical artefact."]
+ ],
+ "PB_UNDERDOG": [
+  [0, 50, 0],
+  [51, 75, 1],
+  [76, 100, 2],
+  [101, 150, 3],
+  [151, 300, 4],
+  [301, null, 5]
+ ],
+ "PB_SEQUENCE": [
+  ["injuries", "Every warrior taken out of action rolls on the Serious Injuries chart: Heroes a D66, Henchmen a D6."],
+  ["experience", "Heroes and Henchmen groups gain experience for the battle, with the underdog bonus; then any advance rolls."],
+  ["exploration", "One D6 for each Hero not taken out of action, one more for a win; the total gives the shards found, doubles or better an unusual location."],
+  ["wyrdstone", "Sell wyrdstone once per sequence; the price is for the whole lot and depends on the size of the warband."],
+  ["veterans", "Roll 2D6: the experience of the veterans available for hire this round."],
+  ["rare", "A Hero not taken out of action may look for one rare item (2D6 against its rarity); what he finds goes into the stash."],
+  ["dramatis", "Look for a Dramatis Persona if you want to hire one."],
+  ["recruits", "Hire new recruits with their free dagger and buy common items, in any order and as often as you like."],
+  ["equipment", "Swap equipment between models as you wish, provided they may use it."],
+  ["rating", "Update the warband rating. You are ready to fight again."]
  ]
 }

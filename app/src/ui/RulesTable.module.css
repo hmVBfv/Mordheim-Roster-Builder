@@ -1,0 +1,10 @@
+.figure { margin: 0.75rem 0; min-width: 0; }
+.scroll { overflow-x: auto; }
+.table { border-collapse: collapse; min-width: 100%; }
+.table caption { text-align: left; font-weight: 600; padding: 0 0 0.35rem; }
+.table th, .table td { border: 1px solid var(--line, #8885); padding: 0.35rem 0.5rem; text-align: left; vertical-align: top; }
+.table thead th { background: var(--accent-soft, #8882); }
+.table tbody th { font-weight: 600; white-space: nowrap; }
+/* the row or column that is the warband's own */
+.mine { background: var(--accent, #8884); font-weight: 600; }
+.source { display: inline-flex; align-items: center; min-height: 44px; }

@@ -59,6 +59,22 @@ test('the rules: from Settings, a chapter at 360 px, and a search that finds hid
   await shot(page, 'rules-search');
 });
 
+test('after the battle: the ten steps and their tables from the Rules, at 360 px, in both themes', async ({ page }) => {
+  await page.goto('#/rules');
+  await page.getByRole('link', { name: /After the battle/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'After the battle' })).toBeVisible();
+  const steps = page.getByRole('heading', { level: 2 });
+  await expect(steps).toHaveCount(10);
+  await expect(steps.nth(3)).toHaveText('4. Sell wyrdstone');
+  await expect(page.getByRole('table', { name: 'Underdog bonus (per fighter)' })).toBeVisible();
+  await expect(page.getByRole('table', { name: 'Wyrdstone prices (gold for the whole lot)' })).toBeVisible();
+  await noSideScroll(page);
+  await tapTargets(page);
+  await shot(page, 'post-battle-rules');
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await shot(page, 'post-battle-rules-dark');
+});
+
 test('the banner holds still when the window is not in focus, and moves again when it is', async ({ page }) => {
   await page.goto('#/home');
   const lights = page.locator('svg [class*="_flicker_"]').first();

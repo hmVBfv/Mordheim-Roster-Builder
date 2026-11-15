@@ -8,3 +8,4 @@ export const MY_REPORTS = `${ACCOUNT}/reports`;
 export const WHATS_NEW = `${ACCOUNT}/whats-new`;
 /** The rulebook: a tab of the Library in the campaign app (Rob, 8.11.2026), a page of its own in the Quick Build, which has no Library. */
 export const RULES = FLAVOUR === 'campaign' ? '/library/rules' : '/rules';
+export const POST_BATTLE_RULES = `${RULES}/post-battle`;

@@ -4,6 +4,7 @@
    the rulebook's order; the wyrdstone sale only reads a price from a table. */
 import type { CampaignState, WarbandState } from '../state/types.ts';
 import type { Ctx } from '../rules/context.ts';
+import type { GameData } from '../data/types.ts';
 import { goldTreasury, isHeroModel } from '../rules/costs.ts';
 import { unitDef } from '../rules/lookup.ts';
 import { campState, logEvent } from '../warband/log.ts';
@@ -158,6 +159,15 @@ export function wyrdSizeBand(n: unknown): number {
   const v = Number(n) || 0;
   for (let i = 0; i < WYRD_BANDS.length; i++) if (v <= (WYRD_BANDS[i] as readonly [number, string])[0]) return i;
   return WYRD_BANDS.length - 1;
+}
+
+/** The experience a warrior earns for fighting a warband that rates this much higher than his own (Campaigns: Experience, Underdogs);
+    nothing when the enemy is not higher. */
+export function underdogBonus(data: GameData, difference: number): number {
+  const d = Number(difference) || 0;
+  if (d <= 0) return 0;
+  for (const [from, to, bonus] of data.PB_UNDERDOG) if (d >= from && (to == null || d <= to)) return bonus;
+  return 0;
 }
 
 /** Models the warband fields, Hired Swords included: mouths to feed. */
