@@ -8,7 +8,9 @@ import ui from '../ui/ui.module.css';
 import styles from './Aftermath.module.css';
 import { fromAftermath } from './back.ts';
 import { experienceTables, injuryTables, locationGroups, shardsTable, type TableData } from './tables.ts';
-import { grantBattleXp, type AftermathView, type CasualtyView } from './view.ts';
+import { ExperienceStep } from './ExperienceStep.tsx';
+import type { UnderdogView } from './underdog.ts';
+import type { AftermathView, CasualtyView } from './view.ts';
 import { WyrdPrices } from './WyrdPrices.tsx';
 
 const ext = { target: '_blank', rel: 'noopener noreferrer' } as const;
@@ -40,6 +42,9 @@ function CasualtyTable({ rows, caption, onRoll }: { rows: CasualtyView[]; captio
 }
 
 export interface StepActs {
+  ctx: core.Ctx;
+  /** The underdog bonus worked out from the battle's frozen ratings, null when the battle is not at hand. */
+  underdog: UnderdogView | null;
   edit: (action: (ctx: core.Ctx) => WarbandState, text?: string, opts?: { gold?: 'settle' | 'keep' }) => void;
   roll: (c: CasualtyView) => void;
 }
@@ -68,33 +73,7 @@ function StepBody({ k, a, data, wid, acts }: { k: string; a: AftermathView; data
         {a.toRoll > 0 ? <p className={styles.warn}>{a.toRoll} still to roll.</p> : <p className={ui.muted}>Nothing left to roll.</p>}
       </>
     );
-    case 'experience': return (
-      <>
-        <p>+1 to every Hero and Henchman group that survived, +1 to the leader of the winning warband, +1 to a Hero for every enemy he put out of action. A scenario may give more: add that on the roster.</p>
-        <div className={ui.row}>
-          <button type="button" className={ui.button} disabled={a.xpAwarded}
-            onClick={() => acts.edit((c) => grantBattleXp(data, c, a.local.id), 'The battle’s experience is held, ready to write onto the roster.')}>
-            {a.xpAwarded ? '✓ Battle experience granted' : 'Grant the battle’s experience'}
-          </button>
-        </div>
-        {a.pendingXp.length > 0 && (
-          <ul className={styles.plain} aria-label="Experience held">
-            {a.pendingXp.map((x) => <li key={x.id}>{x.name} +{x.amount} <small className={ui.muted}>{x.reason}</small></li>)}
-          </ul>
-        )}
-        {(a.pendingXp.length > 0 || a.deathsToApply > 0) && (
-          <div className={ui.row}>
-            <button type="button" className={ui.button} onClick={() => acts.edit((c) => core.applyBattleResults(c), 'Written onto the roster.', { gold: 'keep' })}>Write it onto the roster</button>
-          </div>
-        )}
-        {a.advancesDue.length > 0 && (
-          <>
-            <p>Advance due: {a.advancesDue.join(', ')}.</p>
-            <div className={ui.row}><Link to={`${roster}${from}`} className={ui.buttonQuiet}>Roll it on the roster</Link></div>
-          </>
-        )}
-      </>
-    );
+    case 'experience': return <ExperienceStep a={a} data={data} acts={acts} underdog={acts.underdog} rosterLink={`${roster}${from}`} />;
     case 'exploration': return (
       <>
         <p>

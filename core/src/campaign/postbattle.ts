@@ -170,6 +170,15 @@ export function underdogBonus(data: GameData, difference: number): number {
   return 0;
 }
 
+/** The bonus of one warband against several (Rob, 13.11.2026): each opponent is compared on its own, and the warband takes the largest
+    gap to a higher-rated one. `own` and `others` are warband ratings. */
+export function underdogAgainst(data: GameData, own: number, others: readonly number[]): number {
+  let best = 0;
+  for (const r of others) best = Math.max(best, underdogBonus(data, (Number(r) || 0) - (Number(own) || 0)));
+  return best;
+}
+
+
 /** Models the warband fields, Hired Swords included: mouths to feed. */
 export function warbandSize(ctx: Ctx): number {
   let n = ctx.s.models.reduce((s, m) => { const d = unitDef(ctx, m.uid_def); return s + ((d && d.t === 'hen') ? (Number(m.qty) || 1) : 1); }, 0);
@@ -185,7 +194,8 @@ export function wyrdPrice(ctx: Ctx, shards: unknown, size?: number | null): numb
 
 /* ---- the post-battle sequence ---- */
 
-function postbattleOn(d: WarbandDraft, c: Ctx, round?: number | null): PostBattleState {
+/** The round's record on a draft, made if it is not there yet. */
+export function postbattleOn(d: WarbandDraft, c: Ctx, round?: number | null): PostBattleState {
   const camp = campState(d) as CampaignState & { postbattle?: Record<string, PostBattleState> };
   if (!camp.postbattle) camp.postbattle = {};
   const r = round == null ? pbRound(c) : round;

@@ -118,10 +118,12 @@ describe('the aftermath of one’s warband', () => {
     expect(screen.getByRole('button', { name: '1. Injuries, done' })).toBeTruthy();
 
     // 2. experience: granted once, then written onto the roster
-    await user.click(await screen.findByRole('button', { name: 'Grant the battle’s experience' }));
-    expect((await screen.findByRole('list', { name: 'Experience held' })).textContent).toMatch(/Mercenary Captain \+1/);
-    expect(screen.getByRole('button', { name: '✓ Battle experience granted' })).toHaveProperty('disabled', true);
-    await user.click(screen.getByRole('button', { name: 'Write it onto the roster' }));
+    // the table of the battle's points is read before anything is granted
+    const xp = await screen.findByRole('table', { name: 'Experience of the battle' });
+    const captain = within(xp).getByRole('row', { name: /Mercenary Captain/ });
+    expect(within(captain).getAllByRole('cell').map((c) => c.textContent)).toContain('42 → 43');
+    await user.click(screen.getByRole('button', { name: 'Grant and write onto the roster' }));
+    expect(await screen.findByText('✓ Battle experience granted.')).toBeTruthy();
     await waitFor(async () => expect((await db.warbands.get(mine))!.state.models.find((m) => m.uid === 1)!.exp).toBe(43));
 
     // a step that sends you elsewhere carries the way back: veterans lead to Hire and return to this aftermath (N2)

@@ -33,6 +33,8 @@ export interface AftermathView {
   wyrd: { shards: number; size: number; band: string; sold: core.WyrdSale | null; price: (n: number) => number };
   rating: number;
   gold: number;
+  /** What the experience step recorded for this round (the underdog bonus and the scenario's points), once it was granted. */
+  xpRecord: { underdog: number; scenario: { uid: number | string; amount: number; reason: string }[] } | null;
 }
 
 /** The result line of each step, from the save: what it has brought so far (N2). Null where there is nothing to say yet. */
@@ -90,12 +92,14 @@ export function aftermathView(data: GameData, s: WarbandState, battleId: string)
     },
     rating,
     gold: core.goldCurrent(ctx),
+    xpRecord: (pb.xp ? { underdog: Number(pb.xp.underdog) || 0, scenario: pb.xp.scenario ?? [] } : null),
   };
 }
 
-/** Grants the battle's experience once, and counts the battle for those who took part: +1 to whoever survived, +1 to the leader if it was won (core awardBattleXp), noted on the battle. */
-export function grantBattleXp(data: GameData, ctx: core.Ctx, localId: number): WarbandState {
-  const s = core.awardBattleXp(ctx, localId);
+/** Grants the battle's experience once, and counts the battle for those who took part: +1 to whoever survived, +1 to the leader if it was won
+    (core awardBattleXp), the underdog bonus and the scenario's points when given (N4), noted on the battle. */
+export function grantBattleXp(data: GameData, ctx: core.Ctx, localId: number, opts?: core.BattleXpOptions): WarbandState {
+  const s = core.awardBattleXp(ctx, localId, opts);
   // the same step counts the battle for each who took part (#166); the button is gone once it was granted, so it is counted once
   return core.editBattle(core.ctxOf(data, core.countBattle(core.ctxOf(data, s), localId)), localId, { xpAwarded: true });
 }
