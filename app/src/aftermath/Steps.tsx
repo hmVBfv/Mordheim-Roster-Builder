@@ -1,12 +1,12 @@
 /* The steps of the post-battle sequence (phase 4a4; N2 of docs/plan-postbattle.md): each step's body, the list of steps with its progress. */
 import * as core from '@mordheim/core';
 import type { GameData, WarbandState } from '@mordheim/core';
-import { Link } from 'react-router';
 import { RulesTable } from '../ui/RulesTable.tsx';
 import ui from '../ui/ui.module.css';
 import styles from './Aftermath.module.css';
 import { fromAftermath } from './back.ts';
 import { experienceTables, injuryTables, locationGroups, shardsTable, type TableData } from './tables.ts';
+import { DramatisStep, EquipmentStep, RareStep, RecruitsStep } from './BuyingSteps.tsx';
 import { ExperienceStep } from './ExperienceStep.tsx';
 import { ExplorationStep } from './ExplorationStep.tsx';
 import { UpkeepSection } from './UpkeepSection.tsx';
@@ -52,16 +52,6 @@ export interface StepActs {
   roll: (c: CasualtyView) => void;
 }
 
-/** A step done elsewhere in the app: what it asks, and where. */
-function Go({ text, links }: { text: string; links: [string, string][] }) {
-  return (
-    <>
-      <p>{text}</p>
-      <div className={ui.row}>{links.map(([to, label]) => <Link key={label} to={to} className={ui.buttonQuiet}>{label}</Link>)}</div>
-    </>
-  );
-}
-
 function StepBody({ k, a, data, wid, acts }: { k: string; a: AftermathView; data: GameData; wid: string; acts: StepActs }) {
   const from = fromAftermath(a.local.serverId);
   const roster = `/warbands/${wid}`;
@@ -79,10 +69,10 @@ function StepBody({ k, a, data, wid, acts }: { k: string; a: AftermathView; data
     case 'exploration': return <ExplorationStep a={a} data={data} acts={acts} />;
     case 'wyrdstone': return <><WyrdStep a={a} data={data} acts={acts} /><UpkeepSection a={a} acts={acts} /></>;
     case 'veterans': return <VeteransStep acts={acts} recruitLink={`${roster}${from}`} />;
-    case 'rare': return <Go text="A Hero not taken out of action may look for one rare item: 2D6 against its rarity. What he finds is bought at the Trading Post." links={[[`${roster}/trade${from}`, 'Trading Post']]} />;
-    case 'dramatis': return <Go text="A Dramatis Persona may be found, if the warband may hire one and can pay." links={[[`${roster}/hire${from}`, 'Hire']]} />;
-    case 'recruits': return <Go text={`Hire new warriors and buy common equipment. Gold in hand: ${a.gold} gc.`} links={[[`${roster}${from}`, '+ Recruit on the roster'], [`${roster}/trade${from}`, 'Trading Post']]} />;
-    case 'equipment': return <Go text="Equipment may move freely between warriors; new warriors may take rare items from the stash." links={[[`${roster}${from}`, 'The roster']]} />;
+    case 'rare': return <RareStep a={a} ctx={acts.ctx} tradeLink={`${roster}/trade${from}`} />;
+    case 'dramatis': return <DramatisStep ctx={acts.ctx} hireLink={`${roster}/hire${from}`} />;
+    case 'recruits': return <RecruitsStep a={a} ctx={acts.ctx} rosterLink={`${roster}${from}`} tradeLink={`${roster}/trade${from}`} />;
+    case 'equipment': return <EquipmentStep ctx={acts.ctx} rosterLink={`${roster}${from}`} tradeLink={`${roster}/trade${from}`} />;
     case 'rating': return <p>Warband rating for the next battle: <strong>{a.rating}</strong>.</p>;
     default: return null;
   }
