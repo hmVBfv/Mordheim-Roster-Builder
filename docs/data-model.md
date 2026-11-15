@@ -126,6 +126,12 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   sechs, vorgeschlagen die besten –, die Summe, `shards`, `location`), legt die Splitter in den Stash und einen `Find` mit
   `source: 'explore'` an; ein zweiter Wurf ersetzt den ersten. `clearExploration` nimmt beides zurück. `exploreShards`, `exploreMultiple`
   (zahlreichste Gruppe, bei gleich großen die höhere Augenzahl) und `exploreResult` sind rein.
+  **Was die Erkundung verändert (N6):** `PB_EXPLORE_RULES` (`data/postbattle.json`) nennt Fertigkeiten, Gegenstände, Hired Swords und
+  Bezirke, die Würfel dazugeben (`dice`), Wiederholungen (`reroll`, 6 = alle), ±1 (`adjust`) oder abzulegende Würfel (`drop`) geben,
+  je mit `needs: 'notOOA'`, Quelle (`src`) und `match` (Satzteile der Daten). `exploreAllowances(ctx, round)` findet, was die Warband
+  hat; `recordExploration` bekommt `used` (Ids, je höchstens einmal), und `explore.used` hält sie fest. `PB_EXPLORE_EXCEPTIONS` nennt
+  jede Erwähnung der Erkundung in den Daten, die nicht abgebildet ist, mit Grund; `core/test/explore-allowances.test.ts` liest die Daten
+  und verlangt für jeden Satz über die Erkundung einen Eintrag in der einen oder der anderen Liste (und meldet veraltete Einträge).
 - **Kampagnendatei** (eigenes Dokument, Quick Build): `{ type:
   'mordheim-campaign-file', version: 1, name, round, warbands: [{ id, player,
   name, wb, updated, roster }], battles: [...], log: [...] }`. `roster` ist

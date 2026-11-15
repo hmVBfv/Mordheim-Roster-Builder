@@ -391,3 +391,15 @@
   min-width: var(--tap);
   min-height: var(--tap);
 }
+
+.allowance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.adjust {
+  display: inline-flex;
+  gap: var(--space-1);
+}
