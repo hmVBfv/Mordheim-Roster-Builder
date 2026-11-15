@@ -1765,5 +1765,92 @@
    "All-seeing Eye of Numas",
    "The bearer sees all models, rolls two dice after the battle on the Exploration chart (pick one), and has an extra 6+ save against shooting and close combat."
   ]
+ ],
+ "PB_DUTIES": [
+  {
+   "id": "always-hungry-blackorcs",
+   "wb": "blackorcs",
+   "unit": "botroll",
+   "title": "Always Hungry (Troll)",
+   "text": "20 gc upkeep after each game — or the Troll counts as 2 members for only 5 gc (max size effectively 11).",
+   "src": "warbands/1b/blackorcs.json",
+   "options": [
+    {
+     "id": "pay",
+     "label": "Pay 20 gc",
+     "gc": 20
+    },
+    {
+     "id": "double",
+     "label": "Counts as two members, pay 5 gc",
+     "gc": 5
+    },
+    {
+     "id": "leave",
+     "label": "Let the Troll leave",
+     "gc": 0
+    }
+   ]
+  },
+  {
+   "id": "always-hungry-orcmob",
+   "wb": "orcmob",
+   "unit": "troll",
+   "title": "Always Hungry (Troll)",
+   "text": "15 gc upkeep after each game, or the Boss sacrifices two Goblin Warriors or Cave Squigs; otherwise it wanders off.",
+   "src": "warbands/1a/orcmob.json",
+   "options": [
+    {
+     "id": "pay",
+     "label": "Pay 15 gc",
+     "gc": 15
+    },
+    {
+     "id": "sacrifice",
+     "label": "Sacrifice two Goblin Warriors or Cave Squigs",
+     "gc": 0,
+     "units": [
+      "goblin",
+      "squig"
+     ],
+     "count": 2
+    },
+    {
+     "id": "leave",
+     "label": "Let the Troll wander off",
+     "gc": 0
+    }
+   ]
+  },
+  {
+   "id": "always-hungry-nightgoblins",
+   "wb": "nightgoblins",
+   "unit": "troll",
+   "title": "Always Hungry (Troll)",
+   "text": "15 gc upkeep after each game (or sacrifice two Goblins/Squigs) or it wanders off.",
+   "src": "warbands/1c/nightgoblins.json",
+   "options": [
+    {
+     "id": "pay",
+     "label": "Pay 15 gc",
+     "gc": 15
+    },
+    {
+     "id": "sacrifice",
+     "label": "Sacrifice two Goblins or Cave Squigs",
+     "gc": 0,
+     "units": [
+      "nightgob",
+      "squig"
+     ],
+     "count": 2
+    },
+    {
+     "id": "leave",
+     "label": "Let the Troll wander off",
+     "gc": 0
+    }
+   ]
+  }
  ]
 }

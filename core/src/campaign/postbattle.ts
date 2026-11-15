@@ -82,6 +82,8 @@ export interface PostBattleState {
   xp?: { underdog?: number; scenario?: { uid: number | string; amount: number; reason: string }[] };
   upkeep?: { paid: { uid: string; gc: number }[]; dismissed: string[] };
   finds?: Find[];
+  /** The duties of the warband settled this round (Always Hungry …) and whether the phase is done. */
+  duties?: { resolved: { id: string; option: string; gc: number }[]; done?: boolean };
   /** The place of the Exploration chart taken this round (N8) and the answers it was resolved with. */
   location?: { key: string; answers: Record<string, number | number[] | boolean | string> };
   [key: string]: unknown;

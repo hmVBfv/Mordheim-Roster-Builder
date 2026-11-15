@@ -152,6 +152,7 @@ Begriff einführt, trägt ihn hier ein.
 | Herkunft (von Gold, Funden) | Source | `source` an `Find`, `LedgerEntry`, `StashItem` |
 | Wurf (eingetragen oder in der App) | Roll (entered / in the app) | `Rolled`, `by: 'entered' \| 'app'` |
 | Sold (Hired Sword, Dramatis Persona) | Upkeep | `upkeep`, `hsUpkeepFor` |
+| Pflichten der Warband | Warband duties | `PB_DUTIES`, `dutiesDue`, `postbattle[round].duties`, `Model.countsTwo` |
 | Schlacht schließen | Close the battle | `POST …/battles/:bid/close`, `closeBattle()` |
 | Nachbereitung (einer Warband) | Aftermath (Your aftermath) | `/warbands/:id/aftermath/:bid`, `app/src/aftermath/` |
 | Schlacht übernehmen | Take the battle over (Take it over) | `takeOverBattle()`, `campaign.battles[].serverId` |

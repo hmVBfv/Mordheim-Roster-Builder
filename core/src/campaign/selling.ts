@@ -60,6 +60,8 @@ export function sellingSize(ctx: Ctx, o: SellingOpts): SellingSize {
     if (d.mob) mobs += count - 1;
   }
   if (ogres) { models += ogres; lines.push({ id: 'ogres', text: `${ogres} Ogre${ogres === 1 ? '' : 's'} count double (Gluttony): +${ogres}` }); }
+  const doubled = ctx.s.models.filter((m) => m.countsTwo).length;
+  if (doubled) { models += doubled; lines.push({ id: 'troll', text: `${doubled} counted as two members (Always Hungry): +${doubled}` }); }
   if (mobs) { models -= mobs; lines.push({ id: 'mobs', text: `A mob counts as one model: −${mobs}` }); }
   if (o.manual) { models += o.manual; lines.push({ id: 'manual', text: `Corrected by hand: ${o.manual > 0 ? '+' : ''}${o.manual}` }); }
   models = Math.max(1, models);

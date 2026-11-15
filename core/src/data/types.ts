@@ -321,6 +321,17 @@ export interface ExploreRule {
   match: string[];
 }
 
+/** A duty after a battle: the unit it concerns and the ways out, each with its price. */
+export interface DutyDef {
+  id: string;
+  wb: string;
+  unit: string;
+  title: string;
+  text: string;
+  src: string;
+  options: { id: 'pay' | 'double' | 'sacrifice' | 'leave'; label: string; gc: number; /** sacrifice: the units to choose from and how many. */ units?: string[]; count?: number }[];
+}
+
 export interface GameData {
   MAXPROF: Record<string, Profile>;
   RACELABEL: Record<string, string>;
@@ -398,6 +409,8 @@ export interface GameData {
   PB_LOCATION_RULES: Record<string, Record<string, unknown>[]>;
   /* The magical artefacts table: [name, what it does]; a D6 picks one. */
   PB_ARTEFACTS: [name: string, text: string][];
+  /* Rules that ask for a choice after each battle, with consequences (the warband duties phase): a unit the warband has and what its owner may do. */
+  PB_DUTIES: DutyDef[];
   PB_EXPLORE_EXCEPTIONS: [needle: string, why: string][];
   /* Animals and creatures for leaders' opponent profiles (data/bestiary.json;
      the new app only – legacy does not load the file). */

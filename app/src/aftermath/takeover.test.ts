@@ -175,6 +175,40 @@ describe('the injuries of the aftermath as a table (N3)', () => {
   });
 });
 
+describe('the duties phase in the sequence (Rob, 14.11.2026)', () => {
+  it('the upkeep of Hired Swords is in the same phase: a warband with only a hireling gets it, named for what it holds', () => {
+    const merc = { ...takeOverBattle(data, sampleSave(), battle(), ME, '2026-10-05'), dp: [] } as WarbandState;
+    const hired = { ...merc, hired: [{ key: 'elfranger', uid: 'hs0' }] } as WarbandState;
+    const step = aftermathView(data, hired, 'b-1')!.steps.find((x) => x.key === 'duties')!;
+    expect(step).toMatchObject({ title: 'Upkeep', summary: 'upkeep 0 of 1 paid' });
+    // a warband with both: one phase, both named
+    let s = core.addUnit(ctx({ ...core.newWarband(data, 'blackorcs'), budget: 5000 } as WarbandState), 'bboss');
+    s = core.addUnit(ctx(s), 'botroll');
+    s = { ...takeOverBattle(data, s, battle(), ME, '2026-10-05'), hired: [{ key: 'elfranger', uid: 'hs0' }] } as WarbandState;
+    expect(aftermathView(data, s, 'b-1')!.steps.find((x) => x.key === 'duties')).toMatchObject({ title: 'Upkeep and duties', summary: '0 of 1 duties settled · upkeep 0 of 1 paid' });
+  });
+
+  it('is there after the wyrdstone sale for a warband with such a rule, and not for others', () => {
+    const merc = { ...takeOverBattle(data, sampleSave(), battle(), ME, '2026-10-05'), hired: [], dp: [] } as WarbandState;
+    expect(aftermathView(data, merc, 'b-1')!.steps.map((x) => x.key)).not.toContain('duties');
+    let s = core.addUnit(ctx({ ...core.newWarband(data, 'blackorcs'), budget: 5000 } as WarbandState), 'bboss');
+    s = core.addUnit(ctx(s), 'botroll');
+    s = takeOverBattle(data, s, battle(), ME, '2026-10-05');
+    let a = aftermathView(data, s, 'b-1')!;
+    const keys = a.steps.map((x) => x.key);
+    expect(keys.indexOf('duties')).toBe(keys.indexOf('wyrdstone') + 1);
+    expect(a.steps.find((x) => x.key === 'duties')).toMatchObject({ active: false, locked: true, summary: '0 of 1 duties settled' });
+    // the steps up to the sale done: the duties are next, and the veterans wait for them
+    for (const k of ['injuries', 'experience', 'exploration', 'wyrdstone']) s = core.setPostBattleStep(ctx(s), k, true, 1);
+    a = aftermathView(data, s, 'b-1')!;
+    expect(a.steps.find((x) => x.key === 'duties')).toMatchObject({ active: true });
+    expect(a.steps.find((x) => x.key === 'veterans')).toMatchObject({ active: false, locked: true });
+    s = core.setDutiesDone(ctx(s), 1, true);
+    a = aftermathView(data, s, 'b-1')!;
+    expect(a.steps.find((x) => x.key === 'veterans')).toMatchObject({ active: true });
+  });
+});
+
 describe('what changed', () => {
   it('found and explained as the server freezes it; in words, by warrior, the warband last', () => {
     const before = sampleSave();

@@ -35,6 +35,8 @@ export interface Model {
   uid: number;
   /** Id of the unit definition in the warband. */
   uid_def: string;
+  /** Counts as two members for the warband's maximum (the Troll's "Always Hungry", chosen in the duties phase). */
+  countsTwo?: boolean;
   name?: string;
   names?: string[];
   /** Group size for henchmen; 1 for heroes. */
