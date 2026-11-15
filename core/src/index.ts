@@ -45,6 +45,7 @@ export * from './campaign/selling.ts';
 export * from './campaign/upkeep.ts';
 export * from './campaign/summary.ts';
 export * from './campaign/duties.ts';
+export * from './campaign/rollDuties.ts';
 export * from './campaign/stats.ts';
 export * from './campaign/file.ts';
 export * from './campaign/forms.ts';

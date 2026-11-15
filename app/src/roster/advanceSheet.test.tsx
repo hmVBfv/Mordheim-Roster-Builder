@@ -112,6 +112,20 @@ describe('a new skill or a spell is one choice between two equal kinds (#147)', 
     expect(q(d).queryByRole('group', { name: 'Combat', hidden: true })).toBeNull();
   });
 
+  it('says "New skill or random spell" on the roll, and draws a spell at random for a wizard, who may then apply it', async () => {
+    const { d, lore, onApply } = caster();
+    const user = userEvent.setup();
+    await user.type(q(d).getByRole('textbox', { name: '2D6 as rolled', hidden: true }), '3');
+    expect(q(d).getByRole('heading', { level: 3, name: '3 · New skill or random spell', hidden: true })).toBeTruthy();
+    expect(q(d).queryByRole('button', { name: 'Draw a spell at random', hidden: true })).toBeNull();
+    await user.click(within(q(d).getByRole('group', { name: 'What he learns', hidden: true })).getByRole('button', { name: /^Spell/, hidden: true }));
+    await user.click(q(d).getByRole('button', { name: 'Draw a spell at random', hidden: true }));
+    const group = q(d).getByRole('group', { name: lore, hidden: true });
+    expect(within(group).getAllByRole('button', { hidden: true }).filter((b) => b.getAttribute('aria-pressed') === 'true')).toHaveLength(1);
+    await user.click(q(d).getByRole('button', { name: /^(Take|Learn|Apply|Add)/, hidden: true }));
+    expect(onApply).toHaveBeenCalledTimes(1);
+  });
+
   it('a Hero who casts nothing sees no such choice', async () => {
     const { d } = sheet();
     await userEvent.setup().type(q(d).getByRole('textbox', { name: '2D6 as rolled', hidden: true }), '3');

@@ -142,6 +142,6 @@ export function undoDuty(ctx: Ctx, round: number, dutyId: string): WarbandState 
 export function setDutiesDone(ctx: Ctx, round: number, on: boolean): WarbandState {
   return update(ctx, (d, c) => {
     const rec = postbattleOn(d, c, round);
-    rec.duties = { resolved: rec.duties?.resolved ?? [], done: on };
+    rec.duties = { ...rec.duties, resolved: rec.duties?.resolved ?? [], done: on };
   });
 }

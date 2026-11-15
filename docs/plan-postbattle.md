@@ -771,3 +771,22 @@ der Troll es überschreiten – dann zahlen oder jemanden entlassen. **Umgesetzt
 nach dem Verkauf von Wyrdstone, Daten `PB_DUTIES` (Black Orcs, Orc Mob, Night Goblins), Kern `core/src/campaign/duties.ts`, Oberfläche
 `DutiesStep`. Nicht dabei: weitere Regeln dieser Art (z. B. „Eye of the Gods“ der Maraudiere: 2D6 nach jeder Schlacht) – sie lassen sich als
 weitere Einträge der Phase anfügen, sobald Rob ihre Folgen nennt.
+
+**Würfel-Pflichten (Rob, 15.11.2026, „Mach das“; Branch `feat/duties-more`):** zwei weitere Regeln in derselben Phase, diesmal mit einem Wurf statt einer Wahl
+(`core/src/campaign/rollDuties.ts`, Oberfläche `RollDuties`; die Regeln stehen im Code, weil Schwellen und Folgen je Regel eigen sind):
+
+- **Eye of the Gods** (Marauders of Chaos, mordheimer.net, Special Rules, Tattooed Body, Norse): 2D6 nach jeder Schlacht; verloren: +1 je eigenem Helden außer
+  Gefecht; gewonnen: +1 je Feindmodell, das der Anführer ausgeschaltet hat; Unentschieden: ohne Zuschlag. Ab 12 (Tattooed Body: 10; Norse: 13, mit Tattooed Body 11)
+  wird der Anführer nach einer verlorenen Schlacht zum **Chaos Spawn** (Erfahrung, Fertigkeiten, Verletzungen, Ausrüstung weg; hat die Warband schon einen
+  Spawn, wird er einfach gestrichen; das Gold bleibt wie es ist), nach einer gewonnenen wählt er eine **Mark of the Dark Gods** (`mark` der Warband). Eine Mark, die der
+  Seer beim Anwerben gewählt hat, ist die der Warband, nicht die des Anführers: der Chieftain würfelt weiter und darf nur diese Mark oder Chaos Undivided nehmen
+  (hat er sie schon, sagt er es: kein Wurf mehr, `alreadyMarked`). Hat der Anführer seine Mark, wird nicht mehr gewürfelt – bis er die Warband verlässt: ein neuer muss sich wieder beweisen (`markedLeader` aus den Würfen der Runden); dann ist nur die
+  Mark der Warband oder Chaos Undivided wählbar (keine zwei Marks, Undivided ausgenommen). Kämpfte der Anführer nicht, gilt die Regel nicht. Die App liest aus dem
+  Kampfprotokoll vor, was sie kann (`eyeSuggest`): Ausgang der Schlacht, eigene Helden außer Gefecht (auch tote), Ausschaltungen des Anführers (Opfer nicht aus dem
+  eigenen Roster), ob er Spiele aussetzen muss; der Spieler bestätigt oder korrigiert.
+- **Slick Operator** (Huckster der Hochland-Banditen; mordheimer.net): ein D6 zwischen den Spielen; 2–6: 2D6 gc für die Warband, 1: der Betrug fliegt auf, der Huckster setzt das nächste Spiel aus und es gibt kein Gold. Mit der Fertigkeit **Banditry** nicht kombinierbar (Regeltext der Fertigkeit): hat der Huckster sie, ist die Regel gesperrt.
+
+Die Würfel werden getippt oder in der App gewürfelt (`Rolled.by`, „rolled in the app“). Ergebnis, Würfe und Folgen stehen in `postbattle[round].duties.rolled` und als Fund mit
+Herkunft `duty:<id>`; Gold einer Regel zählt in der Statistik als „Income: other“. **Nicht umgesetzt, mit Grund:** *Looting the Dead* (Hochland-Looter: hängt von
+Gefallenen aller Warbands ab), *Throne of Worms* (Cavalcade: Teil der Verletzungswürfe), *Runt-Erfahrung* (Snotlings: Regel des Gegners), *Tea ceremony* (Nippon,
+eine Fertigkeit), *Addict* und *Inscribe Runes* (vor dem Spiel, nicht danach), *Wizard's Duel* der Sorcerous (Anführerwechsel am Tisch).

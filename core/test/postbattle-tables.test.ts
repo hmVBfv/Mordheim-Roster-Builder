@@ -28,7 +28,7 @@ describe('post-battle tables', () => {
 
   it('the hero advance table (2D6)', () => {
     expect(data.PB_HERO_ADVANCE.map((r) => [r[0], r[1]])).toEqual([
-      ['2–5', 'New skill'], ['6', '+1 S or +1 A'], ['7', '+1 WS or +1 BS'], ['8', '+1 I or +1 Ld'], ['9', '+1 W or +1 T'], ['10–12', 'New skill'],
+      ['2–5', 'New skill or random spell'], ['6', '+1 S or +1 A'], ['7', '+1 WS or +1 BS'], ['8', '+1 I or +1 Ld'], ['9', '+1 W or +1 T'], ['10–12', 'New skill or random spell'],
     ]);
   });
 
