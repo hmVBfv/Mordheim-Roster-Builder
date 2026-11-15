@@ -43,7 +43,41 @@ export const PB_STEPS: readonly (readonly [string, string, string])[] = [
 export const PB_ORDER: readonly string[] = PB_STEPS.map((s) => s[0]);
 
 export interface WyrdSale { done: boolean; shards: number; gc: number; size: number }
-export interface PostBattleState { done: Record<string, boolean>; wyrd: WyrdSale | null; [key: string]: unknown }
+/** A roll made for a step, with where it came from (ADR 0032): typed in from
+    the table, or rolled in the app. `value` holds one number per die. */
+export interface Rolled { value: number[]; by: 'entered' | 'app' }
+
+/** One thing a step brought in or cost, with its origin (ADR 0032): the
+    statistics and the round's balance are made from these. */
+export interface Find {
+  /** Unique within the round's `finds`; never reused. */
+  id: number;
+  kind: 'gold' | 'wyrd' | 'item' | 'exp' | 'note';
+  /** Where it came from: 'explore', 'location:<key>', 'scenario', 'wyrdstone', 'upkeep', … */
+  source: string;
+  /** Gold, shards or experience; negative when it cost something. */
+  amount?: number;
+  /** The stash key of an item (as StashItem.key) and how many. */
+  item?: string;
+  qty?: number;
+  /** List price of one piece in gc, for the value of what was found. */
+  worth?: number;
+  /** The warrior concerned (model uid, or a Hired Sword's uid). */
+  uid?: number | string;
+  text: string;
+}
+
+/** What a round's post-battle sequence has recorded. Every field but `done` and `wyrd` is new in ADR 0032 and optional:
+    older rounds hold only those two and are never recalculated. */
+export interface PostBattleState {
+  done: Record<string, boolean>;
+  wyrd: WyrdSale | null;
+  explore?: { rolled: Rolled; kept: number[]; total: number; shards: number; location: string | null; used?: string[] };
+  xp?: { underdog?: number; scenario?: { uid: number | string; amount: number; reason: string }[] };
+  upkeep?: { paid: { uid: string; gc: number }[]; dismissed: string[] };
+  finds?: Find[];
+  [key: string]: unknown;
+}
 
 /** The round the sequence belongs to: the latest battle's, else the current stage. */
 export function pbRound(ctx: Ctx): number {

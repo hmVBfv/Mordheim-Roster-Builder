@@ -120,6 +120,8 @@ export interface StashItem {
   rare?: boolean;
   /** What one piece cost when it was bought, in gc. */
   paid?: number;
+  /** Where it came from (ADR 0032): 'explore', 'location:<key>', 'search', … Absent on older items. */
+  source?: string;
   [key: string]: unknown;
 }
 
@@ -144,6 +146,8 @@ export interface LedgerEntry {
   qty?: number;
   /** A search for a rare item: whether it was found. */
   found?: boolean;
+  /** Where the gold came from (ADR 0032): 'wyrdstone', 'upkeep', 'location:<key>', … Absent on older bookings. */
+  source?: string;
 }
 
 export interface Stash {
