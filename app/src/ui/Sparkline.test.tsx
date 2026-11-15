@@ -3,7 +3,6 @@ import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ratingSeries } from '../campaign/ratingSeries.ts';
-import type { Tag } from '../campaign/api.ts';
 import { Sparkline, sparkGeometry } from './Sparkline.tsx';
 
 afterEach(cleanup);
@@ -44,9 +43,9 @@ describe('Sparkline', () => {
 });
 
 describe('ratingSeries', () => {
-  const tag = (kind: Tag['kind'], round: number, rating: number, at: string): Tag => ({ id: `${kind}${round}${at}`, kind, rev: 1, round, battleId: null, totals: { rating, spent: 0, models: 0, heroes: 0, gold: 0, fallen: 0 }, createdBy: 'Kai', createdAt: at });
+  const mark = (kind: string, round: number, rating: number, at: string) => ({ kind, round, rating, at });
   it('orders the marks by round, names them, and keeps a round it sat out', () => {
-    const s = ratingSeries([tag('after_battle', 2, 130, '2026-10-03'), tag('start', 0, 107, '2026-10-01'), tag('sat_out', 1, 107, '2026-10-02')]);
+    const s = ratingSeries([mark('after_battle', 2, 130, '2026-10-03'), mark('start', 0, 107, '2026-10-01'), mark('sat_out', 1, 107, '2026-10-02')]);
     expect(s).toEqual([{ label: 'Start', value: 107 }, { label: 'Round 1, sat out', value: 107 }, { label: 'After battle 2', value: 130 }]);
   });
 });

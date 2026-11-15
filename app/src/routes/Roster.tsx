@@ -34,6 +34,7 @@ import { useNotice } from '../ui/Notice.tsx';
 import { FLAVOUR } from '../flavour.ts';
 import { CampaignStage, InCampaign } from '../campaign/InCampaign.tsx';
 import { takeStage } from '../campaign/stage.ts';
+import { OwnRatingLine } from '../campaign/RatingLines.tsx';
 import { rosterView, type HireView, type WarriorView } from '../roster/view.ts';
 import { IconEdit } from '../ui/icons.tsx';
 import { Empty } from '../art/Pixels.tsx';
@@ -293,6 +294,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
       {FLAVOUR === 'campaign' && rec.campaignId && (
         <CampaignStage rec={rec} state={ed.state} onTake={(round) => ed.edit((c) => takeStage(c, round), `Stage: ${core.roundLabel(round)}, as the campaign.`, { gold: 'keep' })} />
       )}
+      {FLAVOUR === 'campaign' && rec.campaignId && <OwnRatingLine campaignId={rec.campaignId} warbandId={rec.id} />}
       {v.planner && <p className={`${ui.card} ${ui.muted}`}>A planner: no gold limit, and advances without experience – each warrior shows the experience they would need. It does not take part in a campaign.</p>}
       {v.warnings.length > 0 && (
         <ul className={`${ui.card} ${board.warnings}`} aria-label="Warnings">
