@@ -410,8 +410,11 @@ zeigt unter den Kacheln eine kleine **Linie** des Ratings über die Marken (Star
 `ratingSeries`): 2 px Linie in der Akzentfarbe, Punkte von 8 px mit einem Ring in der Flächenfarbe, eine leise Grundlinie, der
 letzte Wert direkt beschriftet, ein Tooltip an jedem Punkt, die Überschrift nennt Anfang, Ende und Änderung, und hinter
 **„The numbers“** steht dieselbe Reihe als Tabelle (kein Bild nötig). Eine Reihe braucht zwei Marken; vorher steht dort nichts.
-Nicht gebaut: die Linie in der Kachel „Rating“ des eigenen Rosters und ein Vergleich aller Warbands der Kampagne – beide
-brauchen die Marken aller Warbands auf einmal (heute eine Anfrage je Warband).
+**Teil 2 (13.11.2026):** der Server liefert die Reihen aller Warbands der Kampagne auf einmal (`GET /campaigns/:id/ratings`). Die **Übersicht** der
+Kampagne zeigt unter „Warbands“ den Abschnitt **„Rating over the battles“** mit einer kleinen Linie je Warband (nebeneinander, wo Platz ist; eine Warband mit
+weniger als zwei Marken hat keine), und das **eigene Roster** einer Warband in einer Kampagne zeigt dieselbe Linie unter dem Kopf. Bewusst **eine Linie je
+Karte** statt eines Diagramms mit allen Linien: ein Vergleich in einer Grafik bräuchte Farben je Warband, eine Legende und eine geprüfte Palette, und die Linien
+lassen sich nebeneinander ebenso vergleichen.
 
 **Kopf.** Name der Warband (mit Stift zum Umbenennen), eine Zeile mit Typ,
 Stufe und – falls an – „⚖ N house rules“, vier Kacheln (Gold, Rating, Models
@@ -478,7 +481,7 @@ Wie viele Kämpfe ein Modell mitmachte, zählt seit Wunsch #166 die Warband (Abs
 
 **Zähler der Kämpfe (#166).** Wo die Kampagne die Kämpfe zählt, steht in „Experience“ eine Zeile „Battles fought“: Wer sie nicht
 ändern kann, sieht die Zahl, der Besitzer hat daneben − und +, um einen Stand nachzutragen, der vor dem Zähler begann. Gezählt wird
-im Schritt „Grant the battle's experience“ der Nachbereitung (`countBattle`, einmal je Kampf): +1 für jedes Modell, jede Gruppe und jeden
+im Schritt „Experience“ der Nachbereitung, mit „Grant and write onto the roster“ (`countBattle`, einmal je Kampf): +1 für jedes Modell, jede Gruppe und jeden
 Gekauften, der nicht aussetzt („Misses games“); wer in diesem Kampf fiel, steht schon bei den Gefallenen und bekommt ihn dort
 („Took part in N battles“). Eine Henchmen-Gruppe zählt als Ganzes, auch Männer, die später dazukamen.
 
@@ -692,3 +695,10 @@ Diese Liste steht auch in `CLAUDE.md`.
 - [ ] Hinweise versperren nichts (kurz, wegtippbar, Tipps gehen durch)
 - [ ] Am Desktop wird die Breite genutzt
 - [ ] Playwright-Screenshot des Bildschirms aktualisiert und angesehen
+
+**Erfahrung der Nachbereitung (N4, 14.11.2026).** Der Schritt „Experience“ zeigt eine Tabelle je Krieger: überlebt, Anführer des
+Siegers, Ausschaltungen, Underdog-Bonus, Szenario-Punkte (eigene Eingabe mit Grund, auch „Set for all“), Summe und Erfahrung vorher →
+nachher. Der Underdog-Bonus wird aus den beim Bestätigen eingefrorenen Ratings der Teilnehmer vorgeschlagen (`underdogOf`) und ist
+änderbar; fehlt ein Rating, steht eine Warnung und der Spieler trägt ihn ein. Ein Knopf, „Grant and write onto the roster“, vergibt und
+schreibt (`awardBattleXp` mit `underdog` und `scenario`, danach `applyBattleResults`); der Bonus und die Szenario-Punkte stehen danach
+in `campaign.postbattle[round].xp`.

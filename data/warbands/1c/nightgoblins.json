@@ -186,6 +186,7 @@
       },
       {
         "id": "snotmob",
+        "mob": true,
         "t": "hen",
         "name": "Snotling Mob",
         "cost": 10,

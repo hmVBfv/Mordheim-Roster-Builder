@@ -41,7 +41,7 @@ function Body({ id, read }: { id: string; read: Read }) {
           <div className={board.tile}><dt>Worth</dt><dd>{v.worth}</dd></div>
         </dl>
       </header>
-      <Sparkline title="Rating over the battles" unit="rating" points={ratingSeries(read.tags)} />
+      <Sparkline title="Rating over the battles" unit="rating" points={ratingSeries(read.tags.map((t) => ({ kind: t.kind, round: t.round, rating: t.totals.rating, at: t.createdAt })))} />
       <p className={`${ui.card} ${ui.muted}`}>
         {read.status === 'pending' ? 'Entered, waiting for a leader. ' : ''}
         {start ? `Start marked ${stamp(start.createdAt)} (version ${start.rev}): rating ${start.totals.rating}, ${start.totals.gold} gc, ${start.totals.models} models. ` : ''}

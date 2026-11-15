@@ -23,6 +23,7 @@ sind Platzhalter (`<name>`, `<pi-lan-ip>`).
 | [glossary.md](glossary.md) | Deutsch ↔ Englisch ↔ Code | alle |
 | [roadmap.md](roadmap.md) | Phasen, Abnahmekriterien, offene Entscheidungen | Planung |
 | [plan-2026-11.md](plan-2026-11.md) | Arbeitsplan November 2026: dreizehn Pakete aus der Durchsicht, je mit Umsetzung, Tests und Abnahme | Rob, Planung |
+| [plan-postbattle.md](plan-postbattle.md) | Arbeitsplan Nachspiel: fünfzehn Pakete (N0–N14), damit jeder Schritt nach der Schlacht eingetragen, gewürfelt, verbucht und in Tabellen gezeigt wird | Rob, Planung |
 | [behaviour-changes.md](behaviour-changes.md) | Register: wo `core/` bewusst von der alten App abweicht, und geplante Änderungen am Roster Builder | Rob, Entwicklung |
 | [parity-checklist.md](parity-checklist.md) | Jede Funktion der alten App: in `core/`, in der neuen App, im Mockup, in welcher Phase | Rob, Planung |
 | [rules-audit.md](rules-audit.md) | Abgleich der Regeldaten mit mordheimer.net: Befunde, Korrekturen, offene Fragen | Rob, Entwicklung |

@@ -35,6 +35,8 @@ export interface Model {
   uid: number;
   /** Id of the unit definition in the warband. */
   uid_def: string;
+  /** Counts as two members for the warband's maximum (the Troll's "Always Hungry", chosen in the duties phase). */
+  countsTwo?: boolean;
   name?: string;
   names?: string[];
   /** Group size for henchmen; 1 for heroes. */
@@ -120,6 +122,8 @@ export interface StashItem {
   rare?: boolean;
   /** What one piece cost when it was bought, in gc. */
   paid?: number;
+  /** Where it came from (ADR 0032): 'explore', 'location:<key>', 'search', … Absent on older items. */
+  source?: string;
   [key: string]: unknown;
 }
 
@@ -144,6 +148,8 @@ export interface LedgerEntry {
   qty?: number;
   /** A search for a rare item: whether it was found. */
   found?: boolean;
+  /** Where the gold came from (ADR 0032): 'wyrdstone', 'upkeep', 'location:<key>', … Absent on older bookings. */
+  source?: string;
 }
 
 export interface Stash {
@@ -244,7 +250,25 @@ export interface LogEntry {
   [key: string]: unknown;
 }
 
+/** A lasting advantage or duty the warband won (N8): from a place of the Exploration chart, kept until used (or for good, if unique). */
+export interface Perk {
+  id: string;
+  text: string;
+  /** The round and the place it came from. */
+  round: number;
+  key: string;
+  uid?: number;
+  /** Never used up: the Entrance to the Catacombs gives its re-roll every time. */
+  unique?: boolean;
+  /** What it changes in the exploration roll (extra dice, re-rolls, dice to discard). */
+  explore?: { dice?: number; reroll?: number; drop?: number };
+  /** Used (a one-off advantage). */
+  used?: boolean;
+}
+
 export interface CampaignState {
+  /** Lasting advantages won at places of the Exploration chart (N8). */
+  perks?: Perk[];
   on?: boolean;
   round?: number;
   districts?: Record<string, DistrictHold>;

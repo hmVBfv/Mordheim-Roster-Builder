@@ -1,6 +1,6 @@
 /* The canonical form in which a legacy state and a core state are compared
  * (parity suites and the mirror of the legacy tests). Equal up to:
- *   - core-only bookkeeping (uidSeq, campaign.logSeq),
+ *   - core-only bookkeeping (uidSeq, campaign.logSeq, the post-battle record of ADR 0032: CORE_ONLY_POSTBATTLE, campaign.perks),
  *   - the fixed ids of the Fallen and the links to them (fallen[].id,
  *     casualties[].fallenRef; V2 in docs/behaviour-changes.md): the old app
  *     has neither, and core draws them from the shared id sequence; a
@@ -57,6 +57,9 @@ function canon(s: unknown): unknown {
   return canonCommon(c);
 }
 
+/* Intended difference (docs/behaviour-changes.md, "Nachspiel als Protokoll", ADR 0032): the keys of a post-battle round only core writes. */
+const CORE_ONLY_POSTBATTLE = ['explore', 'xp', 'upkeep', 'finds', 'location'];
+
 /* Everything but the chronicle ids. */
 function canonCommon(c: Rec & { campaign?: Rec; hired?: { uid: string }[]; dp?: { uid: string }[] }): Rec {
   delete c.uidSeq;
@@ -75,6 +78,14 @@ function canonCommon(c: Rec & { campaign?: Rec; hired?: { uid: string }[]; dp?: 
     // A post-battle round nobody has touched, and an empty snapshot list, are
     // what legacy's panels leave behind when they merely look.
     const pb = camp.postbattle as Record<string, Rec> | undefined;
+    // The post-battle record of core (ADR 0032, plan N0 to N9): what a round recorded beyond the steps done and the sale – rolls, finds with
+    // their origin, the place taken, upkeep, the band a sale was read at – and the lasting advantages of the places. Legacy has none of it.
+    for (const st of Object.values(pb ?? {})) {
+      for (const k of CORE_ONLY_POSTBATTLE) delete st[k];
+      const w = st.wyrd as Rec | null | undefined;
+      if (w && typeof w === 'object') { delete w.band; delete w.adjust; }
+    }
+    delete camp.perks;
     if (pb) {
       for (const k of Object.keys(pb)) {
         const st = pb[k] as Rec;

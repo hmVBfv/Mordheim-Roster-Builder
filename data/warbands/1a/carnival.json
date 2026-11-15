@@ -3,6 +3,7 @@
     "name": "Carnival of Chaos",
     "grade": "1a",
     "siteRace": "Chaos Human/Demon",
+    "demonic": true,
     "min": 3,
     "max": 15,
     "gold": 500,
