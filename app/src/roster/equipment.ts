@@ -360,9 +360,12 @@ export interface Searcher { uid: number; name: string; why: string | null; last:
 /** With `de`: who may look for that item – a Familiar is looked for by a Spellcaster only (#60). */
 export function searchers(ctx: core.Ctx, de?: string | null): Searcher[] {
   const round = Number(ctx.s.campaign?.round) || 0;
+  const ooa = core.pbHeroesOOA(ctx);
   return ctx.s.models.filter((m) => core.isHeroModel(ctx, m)).map((m) => {
     const e = (ctx.s.ledger ?? []).filter((x) => x.kind === 'search' && x.uid === m.uid && (Number(x.round) || 0) === round).at(-1);
-    return { uid: m.uid, name: warriorName(ctx, m), why: de ? core.searchBlockFor(ctx, m.uid, de) : core.searchBlock(ctx, m.uid), last: e ? e.text : null };
+    // a Hero taken out of action in the last battle stays home (the casualties of the round tell)
+    const base = de ? core.searchBlockFor(ctx, m.uid, de) : core.searchBlock(ctx, m.uid);
+    return { uid: m.uid, name: warriorName(ctx, m), why: base ?? (ooa.has(m.uid) ? 'taken out of action in the last battle' : null), last: e ? e.text : null };
   });
 }
 

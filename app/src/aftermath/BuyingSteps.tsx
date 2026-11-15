@@ -1,7 +1,11 @@
 /* Steps 6 to 9 (N12): what has happened in this round so far, read from the save – rare items searched for, Dramatis Personae who may be
    found, what was hired and bought, the stash to hand out – and where to go to do it (with the way back). Nothing is decided here. */
 import * as core from '@mordheim/core';
+import { useId, useMemo, useState } from 'react';
 import { Link } from 'react-router';
+import { rareItems, searchers } from '../roster/equipment.ts';
+import { SearchForm } from '../routes/SearchForm.tsx';
+import { useSheet } from '../ui/useSheet.ts';
 import { RulesTable } from '../ui/RulesTable.tsx';
 import ui from '../ui/ui.module.css';
 import type { AftermathView } from './view.ts';
@@ -10,13 +14,20 @@ const gold = (n: number) => `${n > 0 ? '+' : ''}${n} gc`;
 const roundBookings = (ctx: core.Ctx, round: number) => (ctx.s.ledger ?? []).filter((e) => (Number(e.round) || 0) === round);
 
 /** 6 – Make rarity rolls and buy rare items: one line for each Hero – may he search, has he, what did he find. */
-export function RareStep({ a, ctx, tradeLink }: { a: AftermathView; ctx: core.Ctx; tradeLink: string }) {
+export function RareStep({ a, ctx, tradeLink, edit }: { a: AftermathView; ctx: core.Ctx; tradeLink: string; edit: (action: (ctx: core.Ctx) => core.WarbandState, text?: string, opts?: { gold?: 'settle' | 'keep' }) => void }) {
+  const { ref, open, close } = useSheet('search');
+  const [seeking, setSeeking] = useState<number | null>(null);
+  const titleId = useId();
+  const items = useMemo(() => rareItems(ctx), [ctx]);
+  const who = searchers(ctx);
+  const rareName = (de: string) => items.find((x) => x.de === de)?.name ?? de;
+  const purse = ctx.s.planner === true ? Infinity : core.goldCurrent(ctx);
   const searches = roundBookings(ctx, a.round).filter((e) => e.kind === 'search');
   const heroes = ctx.s.models.filter((m) => core.isHeroModel(ctx, m));
   const name = (m: (typeof heroes)[number]) => core.modelLabel(ctx, m);
   const rows = heroes.map((m) => {
     const mine = searches.filter((e) => e.uid === m.uid);
-    const block = core.searchBlock(ctx, m.uid);
+    const block = who.find((x) => x.uid === m.uid)?.why ?? null;
     const state = mine.length ? (mine.some((e) => e.found) ? 'found' : 'searched, not found') : block ? 'cannot search' : 'may search';
     return [name(m), state, mine.map((e) => e.item ?? e.text).join(', ') || (block && !mine.length ? block : '–'), mine.filter((e) => e.found).map((e) => gold(e.amount)).join(', ') || '–'];
   });
@@ -25,7 +36,15 @@ export function RareStep({ a, ctx, tradeLink }: { a: AftermathView; ctx: core.Ct
       <p>A Hero not taken out of action in the last battle looks for one rare item: he rolls 2D6 against its rarity and may find one. What he finds is bought and goes into the stash.</p>
       <RulesTable caption="Searches this round" head={['Hero', 'Now', 'Item / reason', 'Paid']} rows={rows} rowHeads={false} />
       <p className={ui.muted}>{searches.length} search{searches.length === 1 ? '' : 'es'} so far, {searches.filter((e) => e.found).length} found.</p>
-      <div className={ui.row}><Link to={tradeLink} className={ui.buttonQuiet}>Trading Post</Link></div>
+      <div className={ui.row}>
+        <button type="button" className={ui.button} disabled={!who.some((x) => !x.why)} onClick={() => { setSeeking((k) => (k ?? 0) + 1); open(); }}>Search for a rare item</button>
+        <Link to={tradeLink} className={ui.buttonQuiet}>Trading Post</Link>
+      </div>
+      <dialog ref={ref} className={ui.sheet} aria-labelledby={titleId}>
+        {seeking != null && <SearchForm key={seeking} ctx={ctx} start={{ uid: null, de: null }} items={items} gold={purse} close={close} titleId={titleId}
+          onFound={(uid, de, paid, to) => edit((c) => core.recordSearch(c, uid, de, { found: true, paid, to }).state, `Found ${rareName(de)} (−${paid} gc).`)}
+          onMissed={(uid, de) => edit((c) => core.recordSearch(c, uid, de, { found: false }).state, `${rareName(de)}: not found this time.`)} />}
+      </dialog>
     </>
   );
 }

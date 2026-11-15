@@ -5,6 +5,9 @@ import * as core from '@mordheim/core';
 import type { GameData } from '@mordheim/core';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
+import { AdvanceSheet } from '../roster/AdvanceSheet.tsx';
+import { advanceAction, advanceView } from '../roster/advance.ts';
+import { useSheet } from '../ui/useSheet.ts';
 import { RulesTable } from '../ui/RulesTable.tsx';
 import ui from '../ui/ui.module.css';
 import styles from './Aftermath.module.css';
@@ -26,6 +29,9 @@ export function ExperienceStep({ a, data, acts, underdog, rosterLink }: { a: Aft
   const [points, setPoints] = useState<Record<number, string>>({});
   const [all, setAll] = useState('1');
   const tables = useMemo(() => experienceTables(data), [data]);
+  const { ref: advRef, open: openAdv, close: closeAdv } = useSheet('advance');
+  const [advOf, setAdvOf] = useState<{ key: number; id: number | string } | null>(null);
+  const advView = advOf ? advanceView(acts.ctx, advOf.id) : null;
 
   const scenario = Object.entries(points).map(([uid, v]) => ({ uid: Number(uid), amount: num(v), reason: reason.trim() })).filter((x) => x.amount > 0);
   const opts: core.BattleXpOptions = { underdog: num(bonus), scenario: reason.trim() ? scenario : [] };
@@ -122,12 +128,22 @@ export function ExperienceStep({ a, data, acts, underdog, rosterLink }: { a: Aft
             </div>
           </>
         )}
-      {a.advancesDue.length > 0 && (
+      {a.advanceList.length > 0 && (
         <>
-          <p>Advance due: {a.advancesDue.join(', ')}.</p>
-          <div className={ui.row}><Link to={rosterLink} className={ui.buttonQuiet}>Roll it on the roster</Link></div>
+          <p>Advance due – roll the 2D6 here, or type the dice from the table:</p>
+          <ul className={styles.plain} aria-label="Advances due">
+            {a.advanceList.map((w) => (
+              <li key={String(w.id)} className={styles.allowance}>
+                <span>{w.name}</span>
+                <button type="button" className={ui.button} aria-label={`Advance ${w.name}`} onClick={() => { setAdvOf((p) => ({ key: (p?.key ?? 0) + 1, id: w.id })); openAdv(); }}>Advance</button>
+              </li>
+            ))}
+          </ul>
+          <div className={ui.row}><Link to={rosterLink} className={ui.buttonQuiet}>Or on the roster</Link></div>
         </>
       )}
+      <AdvanceSheet dialogRef={advRef} close={closeAdv} view={advView && advOf ? { ...advView, key: advOf.key } : null}
+        onApply={(c, text) => { if (advOf) acts.edit(advanceAction(advOf.id, c), text); }} />
     </>
   );
 }

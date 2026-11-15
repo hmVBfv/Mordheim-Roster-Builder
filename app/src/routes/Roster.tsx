@@ -15,7 +15,7 @@ import { Panel, PanelLink } from '../roster/Panel.tsx';
 import { usePrinting } from '../roster/Print.tsx';
 import type { UnitActs } from '../roster/Detail.tsx';
 import { AdvanceSheet, TakenSheet, type AdvanceChoice, type Correction } from '../roster/AdvanceSheet.tsx';
-import { advanceView, takenOf } from '../roster/advance.ts';
+import { advanceAction, advanceView, takenOf } from '../roster/advance.ts';
 import { EquipmentSheet } from '../roster/EquipmentSheet.tsx';
 import { injuryEnv } from '../roster/injury.ts';
 import { CaptiveSheet, InjuriesSheet, InjurySheet, type InjuryFor } from '../roster/InjurySheet.tsx';
@@ -105,24 +105,7 @@ function RosterBody({ rec }: { rec: StoredWarband }) {
   const injuriesView = injuriesOf != null ? v.heroes.concat(v.henchmen).find((w) => w.uid === injuriesOf) ?? null : null;
 
   /* An advance as chosen in the sheet: the matching action of core. */
-  const applyAdvance = (id: number | string, c: AdvanceChoice, text: string) => ed.edit((x) => {
-    if (typeof id === 'string') {
-      if (c.kind === 'stat') return core.addHsAdvance(x, id, c.stat);
-      if (c.kind === 'skill') return core.addHsSkill(x, id, c.skill);
-      if (c.kind === 'spell') return core.addHsSpell(x, id, c.spell);
-      if (c.kind === 'reduce') return core.hsSpellReduce(x, id, (x.s.hired ?? []).find((h) => h.uid === id)?.spells?.findIndex((sp) => sp.name === c.spell) ?? -1, 1);
-      return x.s;
-    }
-    if (c.kind === 'stat') return core.addAdvance(x, id, c.stat);
-    if (c.kind === 'skill') return core.addSkillFromList(x, id, c.skill);
-    if (c.kind === 'spell') return c.own ? core.addSpellFromAdvance(x, id, c.spell) : core.addSpell(x, id, c.spell);
-    if (c.kind === 'reduce') return core.spellReduce(x, id, x.s.models.find((m) => m.uid === id)?.spells?.findIndex((sp) => sp.name === c.spell) ?? -1, 1);
-    // The lad's got talent: the man becomes a Hero of his own, with his two lists
-    let s1 = c.kind === 'place' ? core.promoteProspect(x, id, c.place, c.man) : core.promoteHench(x, id, c.man);
-    const hero = s1.models.find((m) => m.promoted && !x.s.models.some((o) => o.uid === m.uid))?.uid ?? id;
-    for (const l of c.lists) s1 = core.togglePromoCat(core.ctxOf(data, s1), hero, l);
-    return s1;
-  }, text);
+  const applyAdvance = (id: number | string, c: AdvanceChoice, text: string) => ed.edit(advanceAction(id, c), text);
 
   const correct = (id: number | string, c: Correction, text: string) => ed.edit((x) => {
     if (typeof id === 'string') {

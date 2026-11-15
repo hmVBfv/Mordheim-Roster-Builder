@@ -10,6 +10,7 @@ import { rowFor, STAT_NAMES, type AdvanceView, type Taken } from './advance.ts';
 import styles from './Roster.module.css';
 
 type Sheet = ReturnType<typeof useSheet>;
+const rollDie = (): number => 1 + Math.floor(Math.random() * 6);
 
 export type AdvanceChoice =
   | { kind: 'stat'; stat: StatKey }
@@ -109,6 +110,7 @@ function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['cl
         <input className={ui.input} inputMode="numeric" maxLength={2} value={roll} autoComplete="off"
           onChange={(e) => { setRoll(e.target.value.replace(/\D/g, '')); setStat(null); setPick(null); setDie(''); }} />
       </label>
+      <button type="button" className={ui.buttonQuiet} onClick={() => { setRoll(String(rollDie() + rollDie())); setStat(null); setPick(null); setDie(''); }}>Roll 2D6 here</button>
       <div className={styles.result} aria-live="polite">
         {!row ? <p className={ui.muted}>Enter the total of two dice, 2–12.</p> : (
           <>
@@ -126,6 +128,7 @@ function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['cl
                     <label className={ui.field}><span>D6 as rolled</span>
                       <input className={ui.input} inputMode="numeric" maxLength={1} value={die} autoComplete="off" onChange={(e) => setDie(e.target.value.replace(/[^1-6]/g, ''))} />
                     </label>
+                    <button type="button" className={ui.buttonQuiet} onClick={() => setDie(String(rollDie()))}>Roll the D6 here</button>
                     {chosenStat && <p><b>+1 {STAT_NAMES[chosenStat]}</b>{named && named !== chosenStat && <> · {STAT_NAMES[named]} is at his maximum: he takes {STAT_NAMES[chosenStat]}</>}</p>}
                     <p className={ui.muted}>{v.maxNote}</p>
                   </>
