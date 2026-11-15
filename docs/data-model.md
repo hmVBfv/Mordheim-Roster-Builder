@@ -122,6 +122,10 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   hat, mit Herkunft (`source`: `explore`, `location:<Ort>`, `scenario`,
   `wyrdstone`, `upkeep` …); `id` je Runde eindeutig und nie wiederverwendet.
   `ledger[]` und `stash.items[]` tragen dieselbe optionale `source`.
+  **Erkundung (N5):** `recordExploration(ctx, round, { rolled, kept?, by })` schreibt `explore` (die Würfel, die gewählten – höchstens
+  sechs, vorgeschlagen die besten –, die Summe, `shards`, `location`), legt die Splitter in den Stash und einen `Find` mit
+  `source: 'explore'` an; ein zweiter Wurf ersetzt den ersten. `clearExploration` nimmt beides zurück. `exploreShards`, `exploreMultiple`
+  (zahlreichste Gruppe, bei gleich großen die höhere Augenzahl) und `exploreResult` sind rein.
 - **Kampagnendatei** (eigenes Dokument, Quick Build): `{ type:
   'mordheim-campaign-file', version: 1, name, round, warbands: [{ id, player,
   name, wb, updated, roster }], battles: [...], log: [...] }`. `roster` ist
