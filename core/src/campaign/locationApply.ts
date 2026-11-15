@@ -48,7 +48,8 @@ export function locationProblem(ctx: Ctx, round: number, input: ApplyLocationInp
 
 const nextId = (finds: Find[]): number => finds.reduce((n, f) => Math.max(n, f.id), 0) + 1;
 
-function addGold(d: WarbandDraft, c: Ctx, n: number, text: string, source: string): void {
+/** Gold into (or out of) the treasury: a booking naming its origin when the ledger is kept, else the treasury itself. */
+export function bookGoldOn(d: WarbandDraft, c: Ctx, n: number, text: string, source: string): void {
   if (!n) return;
   if (ledgerOn(d as WarbandState)) {
     const e = bookOn(d, c, 'adjust', n, { text });
@@ -73,7 +74,7 @@ export function applyLocation(ctx: Ctx, round: number, input: ApplyLocationInput
     d.stash.items = d.stash.items ?? [];
     const leader = leaderUid(c);
     r.finds.forEach((f: LocFind, i) => {
-      if (f.kind === 'gold') { addGold(d, c, f.amount ?? 0, f.text, source); add({ kind: 'gold', source, amount: f.amount, text: f.text }); }
+      if (f.kind === 'gold') { bookGoldOn(d, c, f.amount ?? 0, f.text, source); add({ kind: 'gold', source, amount: f.amount, text: f.text }); }
       else if (f.kind === 'wyrd') { d.stash!.wyrd = (Number(d.stash!.wyrd) || 0) + (f.amount ?? 0); add({ kind: 'wyrd', source, amount: f.amount, text: f.text }); }
       else if (f.kind === 'item') {
         const name = f.options ? (input.pick?.[i] ?? f.item as string) : f.item as string;
@@ -121,7 +122,7 @@ export function undoLocation(ctx: Ctx, round: number): WarbandState {
     const rr = postbattleOn(d, c, round);
     d.stash = d.stash ?? { wyrd: 0, gold: null, items: [] };
     const gold = mine.filter((f) => f.kind === 'gold').reduce((n, f) => n + (f.amount ?? 0), 0);
-    if (gold) addGold(d, c, -gold, 'Taken back: a place of the chart', source);
+    if (gold) bookGoldOn(d, c, -gold, 'Taken back: a place of the chart', source);
     d.stash.wyrd = Math.max(0, (Number(d.stash.wyrd) || 0) - mine.filter((f) => f.kind === 'wyrd').reduce((n, f) => n + (f.amount ?? 0), 0));
     for (const f of mine.filter((x) => x.kind === 'item')) {
       const items = d.stash.items ?? [];

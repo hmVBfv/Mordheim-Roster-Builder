@@ -461,7 +461,7 @@ ist als Wyrdstone-Verkauf auswertbar; Changelog.
 
 ### N10 – Sold der Hired Swords
 
-- [ ] erledigt · Platz entschieden: Unterpunkt nach Schritt 4
+- [x] erledigt (Branch `feat/postbattle-n10`; der Sold steht als Unterpunkt unter dem Verkauf von Wyrdstone; „Free (Returning a Favour)“ ist eine Wahl je Söldner, solange die Warband den Dauer-Vorteil `favour` hat) · Platz entschieden: Unterpunkt nach Schritt 4
 
 **Regel:** `…/docs/campaigns/hired-swords#hire-fee`: nach jeder Schlacht, die er
 mitkämpft, **auch der ersten**, ist der Sold fällig, wenn er bleiben soll; ist
