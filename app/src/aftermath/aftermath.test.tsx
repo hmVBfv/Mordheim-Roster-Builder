@@ -131,7 +131,7 @@ describe('the aftermath of one’s warband', () => {
       await user.click(within(document.getElementById(`am-step-${step}`)!).getByRole('button', { name: 'Done – next step' }));
     }
     expect(screen.getByText('Step 5 of 10: Available veterans')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Hire' }).getAttribute('href')).toBe(`/warbands/${mine}/hire?from=${b.id}`);
+    expect(screen.getByRole('link', { name: 'Add men on the roster' }).getAttribute('href')).toBe(`/warbands/${mine}?from=${b.id}`);
 
     // what changed since the start, and the mark
     const list = await screen.findByRole('list', { name: 'Changes' });
