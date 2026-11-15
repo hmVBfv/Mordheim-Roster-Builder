@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { readStatistics, type WarbandStatistics } from '../campaign/api.ts';
 import { useOnCampaign } from '../live/live.ts';
+import { withBattles } from './metrics.ts';
 
 export function useStatistics(campaignId: string | null | undefined): { list: WarbandStatistics[]; loaded: boolean } {
   // what was read says whose it is: another campaign's numbers are never shown for this one
@@ -10,5 +11,5 @@ export function useStatistics(campaignId: string | null | undefined): { list: Wa
   useEffect(load, [campaignId]);
   useOnCampaign(campaignId ?? '', load);
   const ok = got && got.id === campaignId;
-  return { list: ok ? got.list : [], loaded: !!ok };
+  return { list: ok ? withBattles(got.list) : [], loaded: !!ok };
 }

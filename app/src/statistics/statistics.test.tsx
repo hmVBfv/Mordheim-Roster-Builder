@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import type { WarbandStatistics } from '../campaign/api.ts';
 import { Compare } from './Compare.tsx';
 import { LineChart } from './LineChart.tsx';
-import { METRICS, fmt, latestOf, markLabel, metricOf, niceScale, seriesOf, toCsv } from './metrics.ts';
+import { METRICS, fmt, latestOf, markLabel, metricOf, niceScale, seriesOf, toCsv, withBattles } from './metrics.ts';
 
 afterEach(() => cleanup());
 const pt = (round: number, kind: string, metrics: Record<string, number>) => ({ round, kind, at: `2026-10-0${round + 1}T10:00:00.000Z`, metrics });
@@ -135,5 +135,14 @@ describe('compare and export', () => {
     expect(row('Income, total')).toEqual(['140 gc', '–', '–']);
     await userEvent.setup().selectOptions(screen.getByLabelText('Second'), 'c');
     expect(row('Warband rating')).toEqual(['150', '70', '+80']);
+  });
+});
+
+describe('battles fought', () => {
+  it('counts the battles from the marks: a start and a round sat out are none', () => {
+    const [a, b] = withBattles(STATS);
+    expect(a!.points.map((p) => p.metrics.battles)).toEqual([0, 1, 2]);
+    expect(b!.points.map((p) => p.metrics.battles)).toEqual([0, 0]);
+    expect(seriesOf(withBattles(STATS), 'battles').map((s) => s.points.at(-1)!.value)).toEqual([2, 0, 0]);
   });
 });
