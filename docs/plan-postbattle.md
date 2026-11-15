@@ -790,3 +790,9 @@ Die Würfel werden getippt oder in der App gewürfelt (`Rolled.by`, „rolled in
 Herkunft `duty:<id>`; Gold einer Regel zählt in der Statistik als „Income: other“. **Nicht umgesetzt, mit Grund:** *Looting the Dead* (Hochland-Looter: hängt von
 Gefallenen aller Warbands ab), *Throne of Worms* (Cavalcade: Teil der Verletzungswürfe), *Runt-Erfahrung* (Snotlings: Regel des Gegners), *Tea ceremony* (Nippon,
 eine Fertigkeit), *Addict* und *Inscribe Runes* (vor dem Spiel, nicht danach), *Wizard's Duel* der Sorcerous (Anführerwechsel am Tisch).
+
+**Steigerung und Suche auf der Seite (Rob, 15.11.2026; Branch `feat/advance-search`):** Schritt 2 listet, wer eine Steigerung offen hat (`advanceList`), und öffnet
+dieselbe `AdvanceSheet` wie das Roster, mit „Roll 2D6 here“ und „Roll the D6 here“ (gewürfelt in der App, nicht gespeichert: der Spieler sieht das Ergebnis und wendet es
+an); die Aktion ist `advanceAction` (aus dem Roster herausgezogen). Schritt 6 öffnet die Suche nach seltenen Gegenständen auf der Seite (`SearchForm`, aus dem Trading Post
+herausgezogen): **ohne vorgewählten Helden** – wer sucht, wählt der Spieler; ein Held, der in der Schlacht ausgeschaltet wurde, bleibt zu Hause (aus den Verlusten der Runde,
+auch im Trading Post). Der Trading Post hat dazu einen allgemeinen Knopf „Search for a rare item“.

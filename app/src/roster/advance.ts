@@ -5,6 +5,7 @@
    out by core; kept apart from React so it can be tested. */
 import * as core from '@mordheim/core';
 import type { HireRecord, Model, StatKey } from '@mordheim/core';
+import type { AdvanceChoice } from './AdvanceSheet.tsx';
 
 /** One row of an advance table: the 2D6 it covers and what it gives. */
 export interface AdvRow {
@@ -189,5 +190,27 @@ export function takenOf(ctx: core.Ctx, id: number | string): Taken | null {
     advances: STATS.filter((k) => Number(adv[k]) > 0).map((k) => ({ stat: k, n: Number(adv[k]) })),
     skills: (src.skills ?? []).map((name, i) => ({ i, name, text: core.skillInfo(ctx.data, name)?.text ?? '' })),
     spells: (src.spells ?? []).map((sp, i) => ({ i, name: core.spellLabel(sp.name), red: Number(sp.red) || 0 })),
+  };
+}
+
+/** An advance as chosen in the sheet: the matching action of core, for a Hero or henchmen group (a model uid) or a Hired Sword (his uid as text). */
+export function advanceAction(id: number | string, c: AdvanceChoice): (x: core.Ctx) => core.WarbandState {
+  return (x) => {
+    if (typeof id === 'string') {
+      if (c.kind === 'stat') return core.addHsAdvance(x, id, c.stat);
+      if (c.kind === 'skill') return core.addHsSkill(x, id, c.skill);
+      if (c.kind === 'spell') return core.addHsSpell(x, id, c.spell);
+      if (c.kind === 'reduce') return core.hsSpellReduce(x, id, (x.s.hired ?? []).find((h) => h.uid === id)?.spells?.findIndex((sp) => sp.name === c.spell) ?? -1, 1);
+      return x.s;
+    }
+    if (c.kind === 'stat') return core.addAdvance(x, id, c.stat);
+    if (c.kind === 'skill') return core.addSkillFromList(x, id, c.skill);
+    if (c.kind === 'spell') return c.own ? core.addSpellFromAdvance(x, id, c.spell) : core.addSpell(x, id, c.spell);
+    if (c.kind === 'reduce') return core.spellReduce(x, id, x.s.models.find((m) => m.uid === id)?.spells?.findIndex((sp) => sp.name === c.spell) ?? -1, 1);
+    // The lad's got talent: the man becomes a Hero of his own, with his two lists
+    let s1 = c.kind === 'place' ? core.promoteProspect(x, id, c.place, c.man) : core.promoteHench(x, id, c.man);
+    const hero = s1.models.find((m) => m.promoted && !x.s.models.some((o) => o.uid === m.uid))?.uid ?? id;
+    for (const l of c.lists) s1 = core.togglePromoCat(core.ctxOf(x.data, s1), hero, l);
+    return s1;
   };
 }

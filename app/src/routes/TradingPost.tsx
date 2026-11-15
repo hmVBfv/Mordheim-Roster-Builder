@@ -12,14 +12,15 @@ import { useSideNav } from '../app/navChildren.ts';
 import { type StoredWarband } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import {
-  buyRecipients, giveCards, giveRecipients, holdings, KINDS, ledgerLines, rareItems, searchDestinations, searchers, shopItems, stashPaid,
-  type Holding, type Kind, type RareItem, type Recipient, type ShopItem,
+  buyRecipients, giveCards, giveRecipients, holdings, KINDS, ledgerLines, rareItems, searchers, shopItems, stashPaid,
+  type Holding, type Kind, type ShopItem,
 } from '../roster/equipment.ts';
-import { filterRare, gradeOptions, SORT_ORDERS, sortRare, sourceOptions, STAT_FILTERS, type SortOrder, type StatFilter } from '../roster/rareFilter.ts';
+import { filterRare, sortRare, type SortOrder, type StatFilter } from '../roster/rareFilter.ts';
 import { RareLine } from './RareLine.tsx';
 import { useEditor } from '../roster/useEditor.ts';
 import styles from '../roster/Trade.module.css';
 import ui from '../ui/ui.module.css';
+import { Pick, RareMask, SearchForm, gc, signed } from './SearchForm.tsx';
 import { UndoToast } from '../ui/UndoToast.tsx';
 import { useSheet } from '../ui/useSheet.ts';
 import { useWarbandRecord } from '../sync/local.ts';
@@ -27,32 +28,14 @@ import { BuyBoard, GiveBoard, SellBoard } from './GiveBoard.tsx';
 import { HoldingList } from './HoldingList.tsx';
 
 const TABS = [['buy', 'Buy'], ['search', 'Search rare'], ['sell', 'Sell'], ['give', 'Give']] as const;
-/** The highest rarity a search may be narrowed to. */
-const RARITY_STEPS = [6, 8, 10, 12] as const;
 /** Rare items listed before "Show all". */
 const SHORT = 12;
 type Tab = (typeof TABS)[number][0];
-
-const gc = (n: number) => `${n} gc`;
-const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${-n}` : '0');
 
 function Seg<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: readonly (readonly [T, string])[]; onChange: (v: T) => void }) {
   return (
     <div className={styles.seg} role="group" aria-label={label}>
       {options.map(([v, l]) => <button key={v} type="button" aria-pressed={v === value} onClick={() => onChange(v)}>{l}</button>)}
-    </div>
-  );
-}
-
-/** A list of choices, one pressed: who gets the item. */
-function Pick({ label, items, value, onChange }: { label: string; items: Recipient[]; value: core.Holder | null; onChange: (v: core.Holder) => void }) {
-  return (
-    <div className={styles.pick} role="group" aria-label={label}>
-      {items.map((r) => (
-        <button key={String(r.to)} type="button" disabled={!r.ok} aria-pressed={r.to === value} onClick={() => onChange(r.to)}>
-          {r.name}<small className={r.ok ? undefined : styles.no}>{r.note}</small>
-        </button>
-      ))}
     </div>
   );
 }
@@ -90,143 +73,6 @@ function BuyForm({ ctx, item, gold, close, onBuy, titleId }: { ctx: core.Ctx; it
         <button type="button" className={ui.button} disabled={cost > gold} onClick={() => close(() => onBuy(to, qty, cost))}>
           {cost > gold ? `Not enough gold (${gc(cost)})` : `Buy · ${gc(cost)}`}
         </button>
-      </div>
-    </div>
-  );
-}
-
-/** The search mask of the rare items: by name or effect, by the characteristic an item touches, by rarity. */
-function RareMask({ q, stat, max, sort, from, grade, items, onQ, onStat, onMax, onSort, onFrom, onGrade, shown, total }: {
-  q: string; stat: StatFilter | ''; max: number | null; sort: SortOrder; from: string; grade: string; items: RareItem[];
-  onQ: (v: string) => void; onStat: (v: StatFilter | '') => void; onMax: (v: number | null) => void; onSort: (v: SortOrder) => void; onFrom: (v: string) => void; onGrade: (v: string) => void; shown: number; total: number;
-}) {
-  const sources = sourceOptions(items), grades = gradeOptions(items);
-  return (
-    <div className={styles.filters}>
-      <input className={ui.input} type="search" value={q} placeholder="Find by name or effect" aria-label="Find by name or effect" autoComplete="off" onChange={(e) => onQ(e.target.value)} />
-      <div className={styles.filterRow}>
-        <label className={ui.field}><span className={ui.muted}>Touches</span>
-          <select className={ui.select} value={stat} aria-label="Characteristic it touches" onChange={(e) => onStat(e.target.value as StatFilter | '')}>
-            <option value="">any characteristic</option>
-            {STAT_FILTERS.map(([k, l]) => <option key={k} value={k}>{k} · {l}</option>)}
-          </select>
-        </label>
-        <label className={ui.field}><span className={ui.muted}>Rarity</span>
-          <select className={ui.select} value={max ?? ''} aria-label="Highest rarity" onChange={(e) => onMax(e.target.value ? Number(e.target.value) : null)}>
-            <option value="">any rarity</option>
-            {RARITY_STEPS.map((r) => <option key={r} value={r}>Rare {r} or less</option>)}
-          </select>
-        </label>
-      </div>
-      <div className={styles.filterRow}>
-        <label className={ui.field}><span className={ui.muted}>Released with</span>
-          <select className={ui.select} value={from} aria-label="Released with" onChange={(e) => onFrom(e.target.value)}>
-            <option value="">any campaign</option>
-            {sources.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
-          </select>
-        </label>
-        <label className={ui.field}><span className={ui.muted}>Warband grade</span>
-          <select className={ui.select} value={grade} aria-label="Warband grade" onChange={(e) => onGrade(e.target.value)}>
-            <option value="">any grade</option>
-            {grades.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
-          </select>
-        </label>
-      </div>
-      <label className={ui.field}><span className={ui.muted}>Sort by</span>
-        <select className={ui.select} value={sort} aria-label="Sort by" onChange={(e) => onSort(e.target.value as SortOrder)}>
-          {SORT_ORDERS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
-        </select>
-      </label>
-      <p className={ui.muted} aria-live="polite">{shown} of {total} shown</p>
-    </div>
-  );
-}
-
-/* ---- search ---- */
-
-function SearchForm({ ctx, start, items, gold, close, onFound, onMissed, titleId }: {
-  ctx: core.Ctx; start: { uid: number | null; de: string | null }; items: RareItem[]; gold: number; close: SheetApi['close'];
-  onFound: (uid: number, de: string, paid: number, to: core.Holder) => void; onMissed: (uid: number, de: string) => void; titleId: string;
-}) {
-  const [de, setDe] = useState<string | null>(start.de);
-  // once an item is chosen, only those who may look for it are offered (#60)
-  const who = searchers(ctx, de).filter((s) => !s.why);
-  const [picked, setUid] = useState<number | null>(start.uid ?? searchers(ctx).find((s) => !s.why)?.uid ?? null);
-  const uid = who.some((w) => w.uid === picked) ? picked : who[0]?.uid ?? null;
-  const onlyFor = de ? searchers(ctx, de).map((x) => x.why).find((w) => w?.startsWith('only a')) : null;
-  const [q, setQ] = useState('');
-  const [stat, setStat] = useState<StatFilter | ''>('');
-  const [max, setMax] = useState<number | null>(null);
-  const [sort, setSort] = useState<SortOrder>('name');
-  const [from, setFrom] = useState('');
-  const [grade, setGrade] = useState('');
-  const [extra, setExtra] = useState('');
-  const [roll, setRoll] = useState('');
-  const [price, setPrice] = useState('');
-  const [to, setTo] = useState<core.Holder>('stash');
-  const it = items.find((x) => x.de === de) ?? null;
-  const odds = uid != null && de ? core.searchOdds(ctx, uid, de, Number(extra) || 0) : null;
-  const r = Number(roll);
-  const rolled = Number.isInteger(r) && r >= 2 && r <= 12;
-  // a planner (#89) rolls nothing: the merchant has what it looks for, and a price left empty is the average
-  const planner = ctx.s.planner === true;
-  const average = planner && it?.avg != null ? Math.round(it.avg) : null;
-  const found = !!odds && (planner || (rolled && r >= odds.target));
-  const paid = price !== '' ? Number(price) : it?.fixed ?? average ?? NaN;
-  const priceOk = Number.isFinite(paid) && paid >= 0 && (it?.fixed != null || average != null || price !== '');
-  const dest: Recipient[] = de ? searchDestinations(ctx, de, true) : [];
-  const matching = sortRare(filterRare(items, { q, stat, maxRarity: max, from, grade }), sort);
-  const shown = [...items.filter((x) => x.de === de && !matching.includes(x)), ...matching].slice(0, 60);
-  return (
-    <div className={ui.page}>
-      <h2 id={titleId}>{uid != null ? `${who.find((w) => w.uid === uid)?.name ?? 'A Hero'} searches` : 'Search for a rare item'}</h2>
-      {who.length > 1 && (
-        <label className={ui.field}><span>Who searches</span>
-          <select className={ui.select} value={uid ?? ''} onChange={(e) => setUid(Number(e.target.value))}>
-            {who.map((w) => <option key={w.uid} value={w.uid}>{w.name}</option>)}
-          </select>
-        </label>
-      )}
-      {de && who.length === 0 && <p className={`${ui.message} ${styles.no}`} role="status">Nobody here may look for it{onlyFor ? ` – ${onlyFor}` : ''}.</p>}
-      <RareMask q={q} stat={stat} max={max} sort={sort} from={from} grade={grade} items={items} onQ={setQ} onStat={setStat} onMax={setMax} onSort={setSort} onFrom={setFrom} onGrade={setGrade} shown={matching.length} total={items.length} />
-      <div className={`${styles.pick} ${styles.scroll}`} role="group" aria-label="Rare items">
-        {shown.map((x) => (
-          <button key={x.de} type="button" className={styles.rareRow} aria-pressed={x.de === de} onClick={() => setDe(x.de)}>
-            <RareLine it={x} />
-          </button>
-        ))}
-      </div>
-      {it && odds && (
-        <div className={styles.result}>
-          <p><b>{it.name}</b> — needs <b>{odds.target}+</b> on 2D6 ({Math.round(odds.chance * 100)} %)</p>
-          {it.text && <p className={styles.text}>{it.text}</p>}
-          <p className={ui.muted}>Rare {odds.rarity}{odds.modifiers.map((m) => `; ${m.label} ${signed(m.value)}`).join('')}{Number(extra) ? `; other ${signed(Number(extra))}` : ''}.</p>
-        </div>
-      )}
-      <label className={ui.field}><span>Other modifiers (a skill, a Hired Sword, the Merchant's reputation …)</span>
-        <input className={ui.input} inputMode="numeric" value={extra} placeholder="0" maxLength={3} onChange={(e) => setExtra(e.target.value.replace(/[^\d-]/g, ''))} />
-      </label>
-      {!planner && (
-        <label className={ui.field}><span>2D6 as rolled</span>
-          <input className={ui.input} inputMode="numeric" value={roll} maxLength={2} autoComplete="off" onChange={(e) => setRoll(e.target.value.replace(/\D/g, ''))} />
-        </label>
-      )}
-      <p className={`${styles.verdict} ${rolled || planner ? (found ? styles.found : styles.missed) : ''}`} aria-live="polite">
-        {!it ? 'Choose the item he looks for.' : planner ? 'A planner has no roll to make: the merchant has one.' : !rolled ? 'Enter the roll (2 to 12).' : found ? `${r} — found. The merchant has one.` : `${r} — not found this time.`}
-      </p>
-      {found && (
-        <>
-          <label className={ui.field}><span>{it?.fixed != null ? `Price (${gc(it.fixed)}; Haggle may lower it)` : planner && average != null ? `Price (left empty: the average, ${gc(average)})` : `Price as asked (${it?.price})`}</span>
-            <input className={ui.input} inputMode="numeric" value={price} placeholder={it?.fixed != null ? String(it.fixed) : average != null ? String(average) : ''} maxLength={4} onChange={(e) => setPrice(e.target.value.replace(/\D/g, ''))} />
-          </label>
-          <Pick label="Goes to" items={dest} value={to} onChange={setTo} />
-        </>
-      )}
-      <div className={ui.actions}>
-        {!planner && <button type="button" className={ui.buttonQuiet} disabled={!it || uid == null} onClick={() => close(() => onMissed(uid!, de!))}>Not found</button>}
-        <button type="button" className={ui.buttonQuiet} onClick={() => close()}>Cancel</button>
-        <button type="button" className={ui.button} disabled={!found || !priceOk || paid > gold || uid == null}
-          onClick={() => close(() => onFound(uid!, de!, paid, to))}>{found && priceOk ? (paid > gold ? 'Not enough gold' : `Buy · ${gc(paid)}`) : 'Buy'}</button>
       </div>
     </div>
   );
@@ -360,7 +206,10 @@ function Locked({ ed, ctx }: { ed: ReturnType<typeof useEditor>; ctx: core.Ctx }
 
       {tab === 'search' && (
         <section className={ui.page} aria-label="Search for rare items">
-          <p className={ui.muted}>Each Hero may look for one rare item after a battle: 2D6 equal to or above its rarity, less his modifiers. Heroes taken out of action in the last battle stay home – the app cannot tell yet.</p>
+          <p className={ui.muted}>Each Hero may look for one rare item after a battle: 2D6 equal to or above its rarity, less his modifiers. Heroes taken out of action in the last battle stay home.</p>
+          <div className={ui.row}>
+            <button type="button" className={ui.button} disabled={!heroes.some((h) => !h.why)} onClick={() => { setSeeking((p) => ({ key: (p?.key ?? 0) + 1, uid: null, de: null })); openSearch(); }}>Search for a rare item</button>
+          </div>
           <ul className={styles.rows}>
             {heroes.map((h) => (
               <li key={h.uid} className={styles.searcher}>

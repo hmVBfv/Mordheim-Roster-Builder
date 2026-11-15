@@ -29,6 +29,8 @@ export interface AftermathView {
   /** Deaths recorded by hand, not yet taken off the roster. */
   deathsToApply: number;
   advancesDue: string[];
+  /** The same, with the ids the advance sheet needs (a Hero or group: a uid; a Hired Sword: his uid as text). */
+  advanceList: { id: number | string; name: string }[];
   explore: { capped: number; base: number; survivors: number; winDie: number; searching: string[] };
   wyrd: { shards: number; size: number; band: string; sold: core.WyrdSale | null; price: (n: number) => number };
   rating: number;
@@ -103,6 +105,7 @@ export function aftermathView(data: GameData, s: WarbandState, battleId: string)
     pendingXp: core.pendingXp(ctx).map((x) => ({ id: x.id, name: x.name, amount: x.amount, reason: x.reason })),
     deathsToApply: core.outstandingCasualties(ctx, round).length,
     advancesDue: [...v.heroes, ...v.henchmen, ...v.hires].filter((w) => w.advanceDue).map((w) => w.name),
+    advanceList: [...v.heroes, ...v.henchmen, ...v.hires].filter((w) => w.advanceDue).map((w) => ({ id: w.uid, name: w.name })),
     explore: { capped: ex.capped, base: ex.base, survivors: ex.survivors, winDie: ex.winDie, searching: core.pbSearchingHeroes(ctx, round) },
     wyrd: {
       shards: Number(s.stash?.wyrd) || 0, size, band: core.WYRD_BANDS[core.wyrdSizeBand(size)]?.[1] ?? '',

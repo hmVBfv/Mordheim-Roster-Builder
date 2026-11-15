@@ -2,18 +2,20 @@
    typed per warrior – and one button that grants and writes them onto the roster. */
 import * as core from '@mordheim/core';
 import type { WarbandState } from '@mordheim/core';
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { MemoryRouter } from 'react-router';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import type { BattleView } from '../battle/api.ts';
 import { data, sampleSave } from '../test/data.ts';
+import { polyfillDialog } from '../test/dialog.ts';
 import { ExperienceStep } from './ExperienceStep.tsx';
 import { takeOverBattle } from './takeover.ts';
 import { underdogOf } from './underdog.ts';
 import { aftermathView } from './view.ts';
 
+beforeAll(polyfillDialog);
 afterEach(() => cleanup());
 const ME = 'w-me', OP = 'w-op', T = '2026-10-05T20:00:00.000Z';
 const totals = (rating: number) => ({ rating, spent: 0, models: 0, heroes: 0, gold: 0, fallen: 0 });
@@ -73,5 +75,44 @@ describe('the experience step', () => {
     expect(exps().find(([uid]) => uid === 1)![1]).toBe(before + 3);
     expect(screen.getByText(/✓ Battle experience granted\./)).toBeTruthy();
     expect(screen.queryByRole('table', { name: 'Experience of the battle' })).toBeNull();
+  });
+});
+
+describe('the advance, rolled on this page', () => {
+  /** The captain has the experience of two advances' worth: 2 for the first, 4 for the second … he needs a step. */
+  function Due() {
+    const [s, setS] = useState<WarbandState>(() => {
+      const w = takeOverBattle(data, sampleSave(), view(200, 200), ME, '2026-10-05');
+      return { ...w, models: w.models.map((m) => (core.isHeroModel(core.ctxOf(data, w), m) ? { ...m, exp: 40 } : m)) };
+    });
+    const a = aftermathView(data, s, 'b-1')!;
+    const ctx = core.ctxOf(data, s);
+    return (
+      <MemoryRouter>
+        <ExperienceStep a={a} data={data} underdog={null} rosterLink="/x" acts={{ ctx, edit: (f) => setS(f(ctx)) }} />
+        <output data-testid="adv">{JSON.stringify(s.models.map((m) => [m.uid, (m.adv ?? {}) as object, m.skills ?? []]))}</output>
+        <output data-testid="n">{a.advanceList.length}</output>
+      </MemoryRouter>
+    );
+  }
+
+  it('lists who has an advance due, opens the sheet from there, rolls the dice in the app and applies the result to the roster', async () => {
+    const user = userEvent.setup();
+    render(<Due />);
+    const list = screen.getByRole('list', { name: 'Advances due' });
+    expect(within(list).getAllByRole('listitem').length).toBe(Number(screen.getByTestId('n').textContent));
+    const before = screen.getByTestId('adv').textContent;
+    await user.click(within(list).getAllByRole('button', { name: /^Advance / })[0]!);
+    const dlg = screen.getByRole('dialog', { hidden: true });
+    await user.click(within(dlg).getByRole('button', { name: 'Roll 2D6 here', hidden: true }));
+    const roll = within(dlg).getByRole('textbox', { name: '2D6 as rolled', hidden: true }) as HTMLInputElement;
+    expect(Number(roll.value)).toBeGreaterThanOrEqual(2);
+    expect(Number(roll.value)).toBeLessThanOrEqual(12);
+    // whatever the dice said, a typed 7 gives the same kind of choice every time: take it from there
+    await user.clear(roll);
+    await user.type(roll, '7');
+    await user.click(within(dlg).getByRole('button', { name: /^\+1 Weapon Skill/, hidden: true }));
+    await user.click(within(dlg).getByRole('button', { name: 'Apply', hidden: true }));
+    await waitFor(() => expect(screen.getByTestId('adv').textContent).not.toBe(before));
   });
 });
