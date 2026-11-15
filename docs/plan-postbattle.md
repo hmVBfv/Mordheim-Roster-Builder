@@ -555,7 +555,7 @@ Runde jeder Warband gebracht hat; Changelog.
 
 ### N14 – Anschluss an die Statistik (P14)
 
-- [ ] erledigt
+- [x] erledigt (Branch `feat/postbattle-n14`, enthält den Branch `feat/statistics-1` mit `stageMetrics`; neue Felder `incomeLocations`, `incomeScenario`, `upkeepPaid`, `lootValue`; „Sonstiges“ zählt nur Buchungen ohne Herkunft, sonst würde Gold doppelt gezählt)
 
 **Umsetzung:** `stageMetrics` (`core/src/campaign/stats.ts`, Branch
 `feat/statistics-1`) liest die Herkunft: `incomeWyrd`, `incomeLocations`,
