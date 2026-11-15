@@ -4,7 +4,7 @@
    changes frozen as core finds them; then a leader moves the campaign on.
    Against the stand-in server (sync/fakeSync.ts), which computes the
    changes with core as the server does. */
-import { FORMAT, ctxOf, stageTotals, writeSave } from '@mordheim/core';
+import { FORMAT, ctxOf, postBattleSummary, stageTotals, writeSave } from '@mordheim/core';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
@@ -37,7 +37,7 @@ afterEach(async () => { cleanup(); stopSync(); resetSession(); localStorage.clea
 /** The stand-in server behind fetch, signed in as Kai, who leads with the authenticator. */
 function server() {
   const me = { ...KAI, totp: true };
-  const srv = createFakeSync({ me: { id: KAI.id, username: KAI.username, displayName: KAI.displayName }, totals, changes, wbName: (wb) => data.WARBANDS[wb]?.name ?? wb });
+  const srv = createFakeSync({ me: { id: KAI.id, username: KAI.username, displayName: KAI.displayName }, totals, changes, summary: (save, round) => postBattleSummary(ctxOf(data, readSave(data, save)!), round), wbName: (wb) => data.WARBANDS[wb]?.name ?? wb });
   vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = new URL(String(input), 'http://localhost/');
     const path = url.pathname.replace(/^\/api\/v1/, '');
@@ -141,6 +141,8 @@ describe('the aftermath of one’s warband', () => {
     expect(screen.getByText('A preview; nothing is marked yet.').tagName).toBe('SMALL');
     await user.click(screen.getByRole('button', { name: 'Looks right – mark after battle 1' }));
     expect(await screen.findByText(/✓ Marked after battle 1 – version 2/)).toBeTruthy();
+    // the balance of the round is frozen with the mark and read beside the before and after (N13)
+    expect(srv.state.campaigns.get(c.id)!.enrolments.find((x) => x.warbandId === mine)!.tag!.summary).toMatchObject({ round: 1, income: { total: expect.any(Number) } });
     const e = srv.state.campaigns.get(c.id)!.enrolments.find((x) => x.warbandId === mine)!;
     expect(e.tag).toMatchObject({ kind: 'after_battle', rev: 2, round: 1, battleId: b.id });
     expect(e.tag!.changes).toEqual(expect.arrayContaining([expect.objectContaining({ kind: 'experience', name: 'Mercenary Captain', unexplained: false })]));

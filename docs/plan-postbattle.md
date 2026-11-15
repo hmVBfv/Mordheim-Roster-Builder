@@ -529,7 +529,7 @@ Changelog.
 
 ### N13 – Schritt 10: Bilanz der Runde, für alle lesbar
 
-- [ ] erledigt
+- [x] erledigt (Branch `feat/postbattle-n13`; Server: Migration 47, kein neuer Endpunkt – die Bilanz kommt in `marks[…].summary` der Schlacht, die Leak-Matrix und der Vertragstest bleiben unverändert; der Vertragstest der Markierung (PR #428) braucht beim Zusammenführen die Option `summary` im Fake)
 
 **Umsetzung:**
 

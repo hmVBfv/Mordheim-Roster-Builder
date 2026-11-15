@@ -2,11 +2,13 @@
    player confirms it before the battle is fought – a leader can for them –
    and the leader sees what went in beside what came out. Nothing here stops
    a battle: an unconfirmed warband just says so. */
+import type { RoundSummary } from '@mordheim/core';
 import { useState } from 'react';
 import { errorText, type Me } from '../account/api.ts';
 import { db } from '../db/db.ts';
 import { useGameData } from '../game/useGameData.ts';
 import { saveVersion } from '../sync/versions.ts';
+import { BalanceTables } from '../aftermath/BalanceStep.tsx';
 import ui from '../ui/ui.module.css';
 import { confirmBattle, type BattleView, type Participant } from './api.ts';
 import styles from './Battle.module.css';
@@ -106,9 +108,21 @@ export function BeforeAfter({ view, only }: { view: BattleView; only?: string })
                 </div>
               ))}
             </dl>
+            {isRoundSummary(mark?.summary) && (
+              <details>
+                <summary className={ui.fold}>Balance of the round</summary>
+                <BalanceTables r={mark!.summary as RoundSummary} />
+              </details>
+            )}
           </li>
         );
       })}
     </ul>
   );
+}
+
+/** The balance frozen with a mark, when it is one (an older mark has none). */
+function isRoundSummary(x: unknown): x is RoundSummary {
+  const r = x as Partial<RoundSummary> | null;
+  return !!r && typeof r === 'object' && typeof r.round === 'number' && !!r.injuries && !!r.income && !!r.spending && Array.isArray(r.finds) && !!r.after;
 }

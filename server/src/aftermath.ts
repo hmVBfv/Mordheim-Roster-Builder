@@ -5,7 +5,7 @@
    totals and changes; then a leader moves the campaign on to the next
    round – warbands that did not fight are marked as having sat it out. */
 import { randomUUID } from 'node:crypto';
-import { battleEvidence, ctxOf, diffWarbands, loadSave, reconcile, stageTotals, type ReconciledChange, type WarbandState } from '@mordheim/core';
+import { battleEvidence, ctxOf, diffWarbands, loadSave, postBattleSummary, reconcile, stageTotals, type ReconciledChange, type WarbandState } from '@mordheim/core';
 import { audit } from './accounts.ts';
 import { participantIds, type BattleRow } from './battles.ts';
 import { latestTag, type CampaignRow, type Tag } from './campaigns.ts';
@@ -80,10 +80,11 @@ export function markAfterBattle(db: DB, c: CampaignRow, b: BattleRow, warbandId:
     if (!sb || !sa) return { ok: false, status: 400, error: 'invalid', problem: 'the rules cannot read this warband' };
     const changes: ReconciledChange[] = reconcile(diffWarbands(gameData(), sb, sa, b.round), battleEvidence(sa, b.id, b.round));
     const totals = stageTotals(ctxOf(gameData(), sa));
+    const summary = postBattleSummary(ctxOf(gameData(), sa), b.round);
     const old = db.prepare("SELECT id FROM tags WHERE warband_id = ? AND battle_id = ? AND kind = 'after_battle' AND superseded_by IS NULL").get(warbandId, b.id) as { id: string } | undefined;
     const tagId = randomUUID();
-    db.prepare("INSERT INTO tags (id, warband_id, rev, kind, campaign_id, battle_id, round, totals, created_by, created_at) VALUES (?, ?, ?, 'after_battle', ?, ?, ?, ?, ?, ?)")
-      .run(tagId, warbandId, rev, c.id, b.id, b.round, JSON.stringify(totals), by, iso(now));
+    db.prepare("INSERT INTO tags (id, warband_id, rev, kind, campaign_id, battle_id, round, totals, summary, created_by, created_at) VALUES (?, ?, ?, 'after_battle', ?, ?, ?, ?, ?, ?, ?)")
+      .run(tagId, warbandId, rev, c.id, b.id, b.round, JSON.stringify(totals), JSON.stringify(summary), by, iso(now));
     if (old) db.prepare('UPDATE tags SET superseded_by = ? WHERE id = ?').run(tagId, old.id);
     const ins = db.prepare('INSERT INTO changes (tag_id, warband_id, battle_id, seq_in_tag, kind, uid, change_key, payload, event_ref, unexplained) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     changes.forEach((ch, i) => ins.run(tagId, warbandId, b.id, i, ch.kind, ch.hireUid ?? (ch.uid == null ? null : String(ch.uid)), ch.changeKey,
@@ -106,11 +107,11 @@ export function changesOf(db: DB, tagId: string): FrozenChange[] {
 }
 
 /** The mark of each warband after this battle, for the battle's view. */
-export function marksOf(db: DB, battleId: string): Record<string, { tagId: string; rev: number; totals: unknown; changes: number; unexplained: number; createdAt: string }> {
-  const rows = db.prepare(`SELECT t.id, t.warband_id, t.rev, t.totals, t.created_at,
+export function marksOf(db: DB, battleId: string): Record<string, { tagId: string; rev: number; totals: unknown; summary: unknown; changes: number; unexplained: number; createdAt: string }> {
+  const rows = db.prepare(`SELECT t.id, t.warband_id, t.rev, t.totals, t.summary, t.created_at,
       (SELECT count(*) FROM changes x WHERE x.tag_id = t.id) AS n, (SELECT count(*) FROM changes x WHERE x.tag_id = t.id AND x.unexplained = 1) AS u
-    FROM tags t WHERE t.battle_id = ? AND t.kind = 'after_battle' AND t.superseded_by IS NULL`).all(battleId) as { id: string; warband_id: string; rev: number; totals: string; created_at: string; n: number; u: number }[];
-  return Object.fromEntries(rows.map((r) => [r.warband_id, { tagId: r.id, rev: r.rev, totals: JSON.parse(r.totals) as unknown, changes: r.n, unexplained: r.u, createdAt: r.created_at }]));
+    FROM tags t WHERE t.battle_id = ? AND t.kind = 'after_battle' AND t.superseded_by IS NULL`).all(battleId) as { id: string; warband_id: string; rev: number; totals: string; summary: string | null; created_at: string; n: number; u: number }[];
+  return Object.fromEntries(rows.map((r) => [r.warband_id, { tagId: r.id, rev: r.rev, totals: JSON.parse(r.totals) as unknown, summary: r.summary ? (JSON.parse(r.summary) as unknown) : null, changes: r.n, unexplained: r.u, createdAt: r.created_at }]));
 }
 
 export type Advanced = { ok: true; round: number; satOut: string[] } | { ok: false; status: 409; error: string; problem: string };

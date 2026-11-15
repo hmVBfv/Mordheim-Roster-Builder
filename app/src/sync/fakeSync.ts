@@ -57,7 +57,7 @@ export interface FakeTotals { rating: number; spent: number; models: number; her
 export interface FakeChange { kind: string; uid: number | string | null; name: string; changeKey: string; payload: Record<string, unknown>; eventRef: string | null; unexplained: boolean }
 export interface FakeTag {
   id: string; kind: 'start' | 'after_battle' | 'sat_out'; rev: number; round: number; battleId: string | null; totals: FakeTotals; createdBy: string; createdAt: string;
-  changes?: FakeChange[]; supersededBy?: string;
+  changes?: FakeChange[]; supersededBy?: string; /** The balance of the round, frozen with the mark (N13). */ summary?: unknown;
 }
 export interface FakeEnrolment {
   id: string; warbandId: string; playerId: string; player: string; status: 'pending' | 'active'; fromRound: number | null;
@@ -134,7 +134,7 @@ const CODES = ['K7M2Q9XD', 'H4TR8WNP', 'Z3FB6YCM'];
 const NO_TOTALS: FakeTotals = { rating: 0, spent: 0, models: 0, heroes: 0, gold: 0, fallen: 0 };
 
 export function createFakeSync(opts: {
-  me?: { id: string; username: string; displayName: string }; totals?: (save: unknown) => FakeTotals; wbName?: (wb: string) => string;
+  me?: { id: string; username: string; displayName: string }; totals?: (save: unknown) => FakeTotals; /** The balance of the round frozen with a mark (N13), as the server computes it from the marked version. */ summary?: (save: unknown, round: number) => unknown; wbName?: (wb: string) => string;
   /** What changed between two saves, as the server's core finds and explains it. */
   changes?: (before: unknown, after: unknown, battle: { id: string; round: number }) => FakeChange[];
   districtName?: (id: string) => string;
@@ -230,7 +230,7 @@ export function createFakeSync(opts: {
   /** The marks that stand after a battle, by warband. */
   const marksOf = (b: FakeBattle) => Object.fromEntries([...s.campaigns.values()].flatMap((c) => c.enrolments).flatMap((e) => (e.tags ?? [])
     .filter((t) => t.battleId === b.id && t.kind === 'after_battle' && !t.supersededBy)
-    .map((t) => [e.warbandId, { tagId: t.id, rev: t.rev, totals: t.totals, changes: t.changes?.length ?? 0, unexplained: t.changes?.filter((x) => x.unexplained).length ?? 0, createdAt: t.createdAt }])));
+    .map((t) => [e.warbandId, { tagId: t.id, rev: t.rev, totals: t.totals, summary: t.summary ?? null, changes: t.changes?.length ?? 0, unexplained: t.changes?.filter((x) => x.unexplained).length ?? 0, createdAt: t.createdAt }])));
   const battleView = (b: FakeBattle) => ({
     battle: {
       id: b.id, campaignId: b.campaignId, round: b.round, title: b.title, scenario: b.scenario ?? '', district: b.district, status: b.status, turn: b.turn, createdAt: b.createdAt, updatedAt: b.createdAt, closedAt: b.closedAt ?? null,
@@ -1079,7 +1079,7 @@ export function createFakeSync(opts: {
       const before = [...(e.tags ?? [])].reverse().find((t) => !t.supersededBy && t.round < b.round);
       if (!before) return json(409, { error: 'no_start' });
       const changes = opts.changes?.(w.versions.find((q) => q.rev === before.rev)!.data, v.data, { id: b.id, round: b.round }) ?? [];
-      const tag: FakeTag = { id: `tag-${b.id}-${w.id}-${next()}`, kind: 'after_battle', rev: v.rev, round: b.round, battleId: b.id, totals: totalsOf(v.data), createdBy: me.displayName, createdAt: at(), changes };
+      const tag: FakeTag = { id: `tag-${b.id}-${w.id}-${next()}`, kind: 'after_battle', rev: v.rev, round: b.round, battleId: b.id, totals: totalsOf(v.data), summary: opts.summary ? opts.summary(v.data, b.round) : null, createdBy: me.displayName, createdAt: at(), changes };
       for (const t of e.tags ?? []) if (t.battleId === b.id && t.kind === 'after_battle' && !t.supersededBy) t.supersededBy = tag.id;
       e.tags = [...(e.tags ?? []), tag];
       e.tag = tag;
