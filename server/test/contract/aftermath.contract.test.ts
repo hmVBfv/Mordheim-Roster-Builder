@@ -1,10 +1,10 @@
 /* Contract, area 11: after a battle – confirming the version that fights, closing, marking the warband with what changed, correcting the mark
    (server/src/aftermath.ts through routes-battles.ts). The fake takes the changes from core as the server does. The signed-in user leads the
    campaign; the warband's second version changes its name. Plan P5. */
-import { battleEvidence, diffWarbands, loadSave, reconcile } from '@mordheim/core';
+import { battleEvidence, ctxOf, diffWarbands, loadSave, postBattleSummary, reconcile } from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { startAccounts } from '../accounts-helpers.ts';
-import { gameData, summaryOf, totalsOf } from '../../src/rules.ts';
+import { gameData, totalsOf } from '../../src/rules.ts';
 import { compare, fakeSide, serverSide, type Step } from './driver.ts';
 
 const save = (name: string, gold?: number) => ({ wb: 'merc', name, models: [], format: 2, ...(gold === undefined ? {} : { gold }) });
@@ -46,7 +46,7 @@ describe('contract: after a battle', () => {
     const fake = fakeSide({
       me: { id: 'u1', username: 'kai', displayName: 'Kai' },
       totals: (save) => { const t = totalsOf(save); return { rating: t?.rating ?? 0, spent: t?.spent ?? 0, models: t?.models ?? 0, heroes: t?.heroes ?? 0, gold: t?.gold ?? 0, fallen: t?.fallen ?? 0 }; },
-      summary: (save, round) => summaryOf(save, round),
+      summary: (save, round) => { const r = loadSave(gameData(), save); return r.ok ? postBattleSummary(ctxOf(gameData(), r.state), round) : null; },
       wbName: (wb) => (gameData().WARBANDS as Record<string, { name?: string }>)[wb]?.name ?? wb,
       changes: (before, after, battle) => {
         const sb = read(before), sa = read(after);
