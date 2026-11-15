@@ -131,6 +131,30 @@ describe('the post-battle sequence on the save', () => {
   });
 });
 
+describe('the result line of each step', () => {
+  it('says what a step has brought, from the save – and nothing for a step with nothing yet', () => {
+    let s = takeOverBattle(data, sampleSave(), battle(), ME, '2026-10-05');
+    const sum = () => Object.fromEntries(aftermathView(data, s, 'b-1')!.steps.map((x) => [x.key, x.summary]));
+    expect(sum()).toMatchObject({ injuries: '0 of 2 rolled', experience: null, exploration: null, wyrdstone: null, veterans: null, rare: null, recruits: null });
+    expect(sum().rating).toMatch(/^Rating \d+$/);
+
+    s = core.injure(ctx(s), 2, { hero: { code: '41-55' } });
+    s = core.injure(ctx(s), 4, { d6: 5, member: 0 });
+    expect(sum().injuries).toBe('2 of 2 rolled');
+
+    const a = aftermathView(data, grantBattleXp(data, ctx(s), aftermathView(data, s, 'b-1')!.local.id), 'b-1')!;
+    expect(a.steps[1]!.summary).toMatch(/^\d+ points? held$/);
+    s = core.applyBattleResults(ctx(grantBattleXp(data, ctx(s), a.local.id)));
+    expect(sum().experience).toBe('Written onto the roster');
+
+    s = core.stashAdjust(ctx(s), 'wyrd', 3);
+    expect(sum().exploration).toBe('3 shards in the stash');
+    s = core.sellWyrdstone(ctx(s), 1, 3);
+    expect(sum().wyrdstone).toBe(`Sold 3 shards for ${core.wyrdPrice(ctx(s), 3, aftermathView(data, s, 'b-1')!.wyrd.sold!.size)} gc`);
+    expect(sum().exploration).toBeNull(); // none left in the stash
+  });
+});
+
 describe('what changed', () => {
   it('found and explained as the server freezes it; in words, by warrior, the warband last', () => {
     const before = sampleSave();
