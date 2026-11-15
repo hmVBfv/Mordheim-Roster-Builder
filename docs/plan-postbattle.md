@@ -228,7 +228,7 @@ e2e-Screenshots neu und angesehen; UI-Checkliste aus `CLAUDE.md`.
 
 ### N3 – Schritt 1 Verletzungen: Übersicht
 
-- [ ] erledigt
+- [x] erledigt (Branch `feat/postbattle-n3`)
 
 **Regel:** `…/docs/tools#1-injuries`, Einzelheiten `…/docs/campaigns#serious-injuries`.
 

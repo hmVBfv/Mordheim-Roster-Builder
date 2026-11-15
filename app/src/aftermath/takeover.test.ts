@@ -155,6 +155,26 @@ describe('the result line of each step', () => {
   });
 });
 
+describe('the injuries of the aftermath as a table (N3)', () => {
+  it('one row for each casualty: who, the roll, the result, what it means – open ones still to roll, the other players\' apart', () => {
+    let s = takeOverBattle(data, sampleSave(), battle(), ME, '2026-10-05');
+    let rows = aftermathView(data, s, 'b-1')!.casualties;
+    expect(rows.map((r) => [r.name, r.ours, r.roll, r.result])).toEqual([['Champion', true, '', 'pending'], ['Gnawer', false, '', 'pending'], ['Swordsman', true, '', 'pending']]);
+    s = core.injure(ctx(s), 2, { hero: { code: '23', d6: 3 } });
+    s = core.injure(ctx(s), 4, { d6: 5, member: 0 });
+    rows = aftermathView(data, s, 'b-1')!.casualties;
+    const champ = rows.find((r) => r.name === 'Champion')!;
+    expect(champ.roll).toBe('23');
+    expect(champ.result).not.toBe('pending');
+    expect(champ.meaning).toMatch(/\S/);
+    const sword = rows.find((r) => r.name === 'Swordsman')!;
+    expect(sword.result).not.toBe('pending');
+    expect(sword.roll).toMatch(/^\d/);
+    // the other player's casualty stays theirs to roll
+    expect(rows.find((r) => r.name === 'Gnawer')).toMatchObject({ ours: false, open: false, result: 'pending' });
+  });
+});
+
 describe('what changed', () => {
   it('found and explained as the server freezes it; in words, by warrior, the warband last', () => {
     const before = sampleSave();
