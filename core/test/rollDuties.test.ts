@@ -115,3 +115,68 @@ describe('Slick Operator', () => {
     expect(rec(core.setDutiesDone(ctx(t), 1, true))!.duties!.rolled).toHaveLength(1);
   });
 });
+
+describe('Eye of the Gods reads the battle record', () => {
+  const side = (uid: number | null, name = 'x') => ({ uid, name, wb: '', grade: '', value: null });
+  const cas = (id: number, victim: number | null, attacker: number | null) => ({ id, round: 1, battleId: 1, victim: side(victim), attacker: side(attacker), result: 'dead', detail: '', fallenId: null, note: '' });
+  const withRecord = (s: WarbandState, outcome: string, casualties: ReturnType<typeof cas>[]): WarbandState =>
+    ({ ...s, campaign: { ...s.campaign, battles: [{ id: 1, round: 1, outcome }], casualties } } as WarbandState);
+
+  it('a won battle: the enemy models the leader put out of action, and not those another man took', () => {
+    const s = marauders('kurgan', ['champion']);
+    const lead = core.leaderUid(ctx(s))!, other = s.models.find((m) => m.uid !== lead)!.uid;
+    const t = withRecord(s, 'Victory', [cas(1, null, lead), cas(2, null, lead), cas(3, null, other), cas(4, other, lead)]);
+    expect(core.eyeSuggest(ctx(t), 1)).toMatchObject({ result: 'won', count: 2, leaderFought: true });
+  });
+
+  it('a lost battle: the own Heroes out of action, a dead one included', () => {
+    const s = marauders('kurgan', ['champion', 'marauder']);
+    const lead = core.leaderUid(ctx(s))!;
+    const champ = s.models.find((m) => m.uid_def === 'champion')!.uid, man = s.models.find((m) => m.uid_def === 'marauder')!.uid;
+    const t = withRecord(s, 'Defeat', [cas(1, champ, null), cas(2, man, null), cas(3, lead, null)]);
+    expect(core.eyeSuggest(ctx(t), 1)).toMatchObject({ result: 'lost', count: 2 });
+    expect(core.eyeSuggest(ctx(withRecord(s, 'Routed', [])), 1)).toMatchObject({ result: 'lost', count: 0 });
+    expect(core.eyeSuggest(ctx(withRecord(s, 'Draw', [])), 1)).toMatchObject({ result: 'draw', count: 0 });
+    expect(core.eyeSuggest(ctx(s), 1).result).toBeUndefined();
+  });
+
+  it('a leader who has to miss games did not fight', () => {
+    const s = marauders();
+    const t = { ...s, models: s.models.map((m) => (m.uid_def === 'chieftain' ? { ...m, miss: 1 } : m)) };
+    expect(core.eyeSuggest(ctx(t), 1).leaderFought).toBe(false);
+  });
+});
+
+describe('Eye of the Gods and a new leader', () => {
+  const marked = (): WarbandState => core.resolveRollDuty(ctx(marauders('kurgan', ['champion'])), 1, 'eye-of-the-gods', { result: 'won', count: 3, roll: dice(5, 4), mark: 'serpent' });
+
+  it('the Mark ends the test for this leader, but a new leader must prove himself again', () => {
+    const s = marked();
+    expect(core.rollDutiesDue(ctx(s), 2)).toEqual([]);
+    const gone = { ...s, models: s.models.filter((m) => m.uid_def !== 'chieftain') };
+    expect(core.rollDutiesDue(ctx(gone), 2).map((d) => d.id)).toEqual(['eye-of-the-gods']);
+  });
+
+  it('a warband that follows a Mark takes that one again, or Chaos Undivided – not a different one; taking it back restores the Mark it had', () => {
+    const s = marked();
+    const gone = { ...s, models: s.models.filter((m) => m.uid_def !== 'chieftain') };
+    const input = { result: 'won' as const, count: 3, roll: dice(5, 4) };
+    expect(core.rollDutyProblem(ctx(gone), 2, 'eye-of-the-gods', { ...input, mark: 'eagle' })).toMatch(/already follows a Mark/);
+    expect(core.rollDutyProblem(ctx(gone), 2, 'eye-of-the-gods', { ...input, mark: 'serpent' })).toBeNull();
+    const t = core.resolveRollDuty(ctx(gone), 2, 'eye-of-the-gods', { ...input, mark: 'undivided' });
+    expect(t.mark).toBe('undivided');
+    expect(core.undoRollDuty(ctx(t), 2, 'eye-of-the-gods').mark).toBe('serpent');
+  });
+});
+
+describe('Slick Operator and Banditry', () => {
+  it('a Huckster with the Banditry skill cannot use Slick Operator: the two may not be combined', () => {
+    const s = huckster();
+    const t = { ...s, models: s.models.map((m) => (m.uid_def === 'huckster' ? { ...m, skills: ['Banditry'] } : m)) };
+    const [d] = core.rollDutiesDue(ctx(t), 1);
+    expect(d!.blocked).toMatch(/Banditry/);
+    expect(core.rollDutyProblem(ctx(t), 1, 'slick-operator', { roll: dice(1) })).toMatch(/Banditry/);
+    expect(core.resolveRollDuty(ctx(t), 1, 'slick-operator', { roll: dice(1) })).toBe(t);
+    expect(core.rollDutiesDue(ctx(s), 1)[0]!.blocked).toBeUndefined();
+  });
+});

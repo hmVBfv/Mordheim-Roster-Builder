@@ -3,11 +3,12 @@
      the leader into a Chaos Spawn (his experience, skills, injuries and gear are lost; with a Spawn already, he is simply erased), a won battle gives
      the leader a Mark of the Dark Gods. Once the warband has a Mark the test is no longer taken;
    - the Hochland Huckster's "Slick Operator": a D6 between games: 2–6 the warband gains 2D6 gc, 1 he misses the next game.
-   The dice are entered or rolled in the app (Rolled, ADR 0032); each result is recorded with its origin. */
+   The Eye reads what it can from the battle record (how it ended, Heroes out of action, the leader's kills, whether he fought); the player confirms or
+   corrects. The dice are entered or rolled in the app (Rolled, ADR 0032); each result is recorded with its origin. */
 import { ctxOf, type Ctx } from '../rules/context.ts';
-import { goldCurrent, totalSpent } from '../rules/costs.ts';
+import { goldCurrent, isHeroModel, totalSpent } from '../rules/costs.ts';
 import { leaderUid } from '../rules/profile.ts';
-import type { Model, WarbandState } from '../state/types.ts';
+import type { Casualty, Model, WarbandState } from '../state/types.ts';
 import { addUnit } from '../warband/roster.ts';
 import { setMark } from '../warband/advance.ts';
 import { rememberUids, update } from '../warband/update.ts';
@@ -24,7 +25,14 @@ export interface RollDutyLine {
   uid: number;
   /** What was settled this round, or null. */
   resolved: { outcome: string; total?: number; text: string } | null;
+  /** Why it cannot be settled now (a rule that excludes it), or absent. */
+  blocked?: string;
+  /** The Eye: what the battle record says. */
+  suggest?: EyeSuggest;
 }
+
+/** What the battle record says about the Eye of the Gods: how the battle ended for us, the count that goes with it, whether the leader fought. */
+export interface EyeSuggest { result?: 'won' | 'lost' | 'draw'; count: number; leaderFought: boolean; from: string }
 
 export interface RollDutyInput {
   /** Eye of the Gods: how the battle ended for the warband, the count to add (Heroes out of action when lost, enemy models the leader took out when won), whether the leader fought. */
@@ -53,20 +61,55 @@ export function eyeThreshold(ctx: Ctx): number {
   return (tattooed ? 10 : 12) + (norse ? 1 : 0);
 }
 
+const outcomeOf = (ctx: Ctx, round: number): 'won' | 'lost' | 'draw' | undefined => {
+  const o = ((ctx.s.campaign?.battles ?? []).find((b) => (b as { round?: number }).round === round) as { outcome?: string } | undefined)?.outcome ?? '';
+  return /victor/i.test(o) ? 'won' : /defeat|routed/i.test(o) ? 'lost' : /draw/i.test(o) ? 'draw' : undefined;
+};
+
+/** The leader who last received a Mark through the Eye (from the record of the rounds): a new leader must prove himself again. */
+export function markedLeader(ctx: Ctx): number | null {
+  const rounds = Object.entries((ctx.s.campaign as { postbattle?: Record<string, PostBattleState> } | undefined)?.postbattle ?? {}).sort((a, b) => Number(a[0]) - Number(b[0]));
+  let uid: number | null = null;
+  for (const [, p] of rounds) for (const r of p?.duties?.rolled ?? []) if (r.id === ids.eye && r.outcome === 'mark' && r.uid != null) uid = r.uid;
+  return uid;
+}
+
+/** What the battle record says: the result, our Heroes out of action (dead ones included), the casualties the leader dealt to others, and whether he fought
+    (a man who must miss games did not). The player confirms or corrects it. */
+export function eyeSuggest(ctx: Ctx, round: number): EyeSuggest {
+  const lead = leaderUid(ctx);
+  const cas = ((ctx.s.campaign?.casualties ?? []) as Casualty[]).filter((c) => c.round === round);
+  const heroUid = (uid: number) => {
+    const m = ctx.s.models.find((x) => x.uid === uid);
+    return m ? isHeroModel(ctx, m) : (ctx.s.fallen ?? []).some((f) => f.kind === 'hero' && f.m?.uid === uid);
+  };
+  const heroes = new Set(cas.filter((c) => c.victim?.uid != null && heroUid(c.victim.uid)).map((c) => c.victim.uid as number)).size;
+  const kills = cas.filter((c) => lead != null && c.attacker?.uid === lead && c.victim?.uid == null).length;
+  const result = outcomeOf(ctx, round);
+  const leader = ctx.s.models.find((m) => m.uid === lead);
+  const fought = !leader || !(Number(leader.miss) > 0);
+  return { result, count: result === 'won' ? kills : result === 'lost' ? heroes : 0, leaderFought: fought, from: result ? `Battle record: ${result === 'won' ? `won, the leader put ${kills} enemy model${kills === 1 ? '' : 's'} out of action` : result === 'lost' ? `lost, ${heroes} of your Heroes out of action` : 'drawn'}.` : 'No battle record: say how it ended.' };
+}
+
 /** The roll duties due after this battle. */
 export function rollDutiesDue(ctx: Ctx, round: number): RollDutyLine[] {
   const done = roundRec(ctx.s, round)?.duties?.rolled ?? [];
   const out: RollDutyLine[] = [];
-  const line = (kind: RollDutyKind, title: string, text: string, uid: number) => {
+  const line = (kind: RollDutyKind, title: string, text: string, uid: number, extra: Partial<RollDutyLine> = {}) => {
     const r = done.find((x) => x.id === ids[kind]);
-    out.push({ id: ids[kind], kind, title, text, uid, resolved: r ? { outcome: r.outcome, total: r.total, text: r.text } : null });
+    out.push({ id: ids[kind], kind, title, text, uid, resolved: r ? { outcome: r.outcome, total: r.total, text: r.text } : null, ...extra });
   };
-  if (ctx.s.wb === 'maraudersofchaos' && (!ctx.s.mark || done.some((x) => x.id === ids.eye))) { // with a Mark the test is no longer taken – but this round's result stays shown
+  // with a Mark the test is no longer taken – until the leader leaves and a new one must prove himself; this round's result stays shown
+  if (ctx.s.wb === 'maraudersofchaos' && (!ctx.s.mark || (markedLeader(ctx) !== null && markedLeader(ctx) !== leaderUid(ctx)) || done.some((x) => x.id === ids.eye))) {
     const lead = leaderUid(ctx);
-    if (lead != null) line('eye', 'Eye of the Gods', `Roll 2D6 after the battle, plus 1 for each of your Heroes taken out of action if you lost, or for each enemy model the leader took out of action if you won. On ${eyeThreshold(ctx)}+ a lost battle turns the leader into a Chaos Spawn, a won one lets him choose a Mark of the Dark Gods. Not in effect if the leader did not fight.`, lead);
+    if (lead != null) line('eye', 'Eye of the Gods', `Roll 2D6 after the battle, plus 1 for each of your Heroes taken out of action if you lost, or for each enemy model the leader took out of action if you won. On ${eyeThreshold(ctx)}+ a lost battle turns the leader into a Chaos Spawn, a won one lets him choose a Mark of the Dark Gods. Not in effect if the leader did not fight.${ctx.s.mark ? ' The leader already has a Mark: a new leader must prove himself the same way.' : ''}`, lead, { suggest: eyeSuggest(ctx, round) });
   }
   const hs = ctx.s.wb === 'hochland' ? ctx.s.models.find((m) => m.uid_def === 'huckster') : undefined;
-  if (hs) line('slick', 'Slick Operator (Huckster)', 'Between games roll a D6: on 2–6 the warband gains 2D6 gc, on a 1 the Huckster misses the next game. Not together with the Banditry skill.', hs.uid);
+  if (hs) {
+    const banditry = (hs.skills ?? []).some((k) => String(k).toLowerCase() === 'banditry');
+    line('slick', 'Slick Operator (Huckster)', 'Between games the Huckster runs a con. Roll a D6: on 2–6 it works and the warband gains 2D6 gc (he keeps the rest); on a 1 it backfires: he is on the run, misses the next game, and the warband gets no gold.', hs.uid,
+      banditry ? { blocked: 'He has the Banditry skill, which may not be combined with Slick Operator (mordheimer.net, Hochland Bandits): he uses one or the other.' } : {});
+  }
   return out;
 }
 
@@ -75,13 +118,17 @@ export function rollDutyProblem(ctx: Ctx, round: number, id: string, input: Roll
   const d = rollDutiesDue(ctx, round).find((x) => x.id === id);
   if (!d) return 'There is no such rule.';
   if (d.resolved) return 'This is settled: take it back first.';
+  if (d.blocked) return d.blocked;
   if (d.kind === 'eye') {
     if (input.leaderFought === false) return null;
     if (!input.result) return 'Say how the battle ended.';
     if (!diceOk(input.roll, 2)) return 'Enter the two dice.';
     if (!Number.isInteger(input.count) || (input.count as number) < 0) return 'The count is a number from 0.';
     const hit = sum(input.roll) + (input.result === 'draw' ? 0 : (input.count as number)) >= eyeThreshold(ctx);
-    if (hit && input.result === 'won' && !ctx.data.MARAUDER_MARKS.some((m) => m[0] === input.mark)) return 'Choose the Mark.';
+    if (hit && input.result === 'won') {
+      if (!ctx.data.MARAUDER_MARKS.some((m) => m[0] === input.mark)) return 'Choose the Mark.';
+      if (ctx.s.mark && input.mark !== ctx.s.mark && input.mark !== 'undivided') return 'The warband already follows a Mark: only that one, or Chaos Undivided, may be taken (no two models with different Marks).';
+    }
     return null;
   }
   if (!diceOk(input.roll, 1)) return 'Enter the D6.';
@@ -94,7 +141,7 @@ export function resolveRollDuty(ctx: Ctx, round: number, id: string, input: Roll
   if (rollDutyProblem(ctx, round, id, input)) return ctx.s;
   const d = rollDutiesDue(ctx, round).find((x) => x.id === id)!;
   const source = `duty:${id}`;
-  let s = ctx.s, outcome = 'nothing', text = '', total: number | undefined, gc = 0;
+  let s = ctx.s, outcome = 'nothing', text = '', total: number | undefined, gc = 0, prevMark: string | undefined;
   const rolls: Rolled[] = [];
   if (d.kind === 'eye') {
     if (input.leaderFought === false) { outcome = 'not-in-effect'; text = 'The leader did not fight: the Eye of the Gods is not in effect.'; }
@@ -112,7 +159,7 @@ export function resolveRollDuty(ctx: Ctx, round: number, id: string, input: Roll
         s = update(ctxOf(ctx.data, s), (dr, c) => { dr.stash = dr.stash ?? { wyrd: 0, gold: null, items: [] }; dr.stash.gold = goldBefore + totalSpent(c); });
         text += hadSpawn ? ' The leader is erased from the roster (the warband has a Spawn already).' : ' The leader turns into a Chaos Spawn: his experience, skills, injuries and gear are lost.';
       } else if (total >= need && input.result === 'won') {
-        outcome = 'mark';
+        outcome = 'mark'; prevMark = ctx.s.mark ?? '';
         s = setMark(ctxOf(ctx.data, s), input.mark!);
         text += ` The leader takes a Mark: ${ctx.data.MARAUDER_MARKS.find((m) => m[0] === input.mark)![1]}.`;
       } else text += ' Nothing happens.';
@@ -133,7 +180,7 @@ export function resolveRollDuty(ctx: Ctx, round: number, id: string, input: Roll
   return update(ctxOf(ctx.data, s), (dr, c) => {
     const rec = postbattleOn(dr, c, round);
     const duties = rec.duties ?? { resolved: [] };
-    duties.rolled = [...(duties.rolled ?? []), { id, rolls, total: total ?? sum(rolls[0]), outcome, text }];
+    duties.rolled = [...(duties.rolled ?? []), { id, rolls, total: total ?? sum(rolls[0]), outcome, text, uid: d.uid, ...(prevMark !== undefined ? { prevMark } : {}) }];
     rec.duties = duties;
     const finds = rec.finds ?? [];
     finds.push({ id: finds.reduce((n, f) => Math.max(n, f.id), 0) + 1, kind: gc ? 'gold' : 'note', source, ...(gc ? { amount: gc } : {}), text } satisfies Find);
@@ -148,7 +195,7 @@ export function undoRollDuty(ctx: Ctx, round: number, id: string): WarbandState 
   const gold = r.outcome === 'gold' ? sum(r.rolls[1]) : 0;
   const markWas = r.outcome === 'mark';
   let s = ctx.s;
-  if (markWas) s = setMark(ctx, '');
+  if (markWas) s = setMark(ctx, r.prevMark ?? '');
   return update(ctxOf(ctx.data, s), (dr, c) => {
     const rr = postbattleOn(dr, c, round);
     if (gold) bookGoldOn(dr, c, -gold, 'Slick Operator: taken back', `duty:${id}`);

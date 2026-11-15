@@ -50,6 +50,27 @@ describe('Eye of the Gods', () => {
     expect(screen.getByText(/✓ Eye of the Gods:/)).toBeTruthy();
   });
 
+  it('fills the result and the count from the battle record, and the player may still correct them', async () => {
+    const user = userEvent.setup();
+    const s0 = warband('maraudersofchaos', ['chieftain']);
+    const lead = core.leaderUid(core.ctxOf(data, s0))!;
+    const cas = (id: number) => ({ id, round: 1, battleId: 1, victim: { uid: null, name: 'x', wb: '', grade: '', value: null }, attacker: { uid: lead, name: 'Chief', wb: '', grade: '', value: null }, result: 'dead', detail: '', fallenId: null, note: '' });
+    const s = { ...s0, campaign: { ...s0.campaign, casualties: [...(s0.campaign?.casualties ?? []), cas(901), cas(902)] } } as WarbandState;
+    function Rec() {
+      const [st, setSt] = useState(s);
+      const ctx = core.ctxOf(data, st);
+      return <DutiesStep a={aftermathView(data, st, 'b-1')!} acts={{ ctx, edit: (f) => setSt(f(ctx)) }} />;
+    }
+    render(<Rec />);
+    expect(screen.getByText(/Battle record: won, the leader put 2 enemy models out of action/)).toBeTruthy();
+    expect((screen.getByLabelText('How the battle ended') as HTMLSelectElement).value).toBe('won');
+    const count = screen.getByLabelText('Enemy models the leader took out of action') as HTMLInputElement;
+    expect(count.value).toBe('2');
+    await user.clear(count);
+    await user.type(count, '5');
+    expect(count.value).toBe('5');
+  });
+
   it('a lost battle on 12+ turns the leader into a Spawn', async () => {
     const user = userEvent.setup();
     render(<Harness wb="maraudersofchaos" units={['chieftain']} />);
@@ -74,6 +95,17 @@ describe('Eye of the Gods', () => {
 });
 
 describe('Slick Operator', () => {
+  it('says so, and cannot be settled, for a Huckster with the Banditry skill', () => {
+    function Ban() {
+      const [st] = useState(() => { const w = warband('hochland', ['prince', 'huckster']); return { ...w, models: w.models.map((m) => (m.uid_def === 'huckster' ? { ...m, skills: ['Banditry'] } : m)) } as WarbandState; });
+      const ctx = core.ctxOf(data, st);
+      return <DutiesStep a={aftermathView(data, st, 'b-1')!} acts={{ ctx, edit: () => undefined }} />;
+    }
+    render(<Ban />);
+    expect(screen.getByText(/Banditry skill, which may not be combined with Slick Operator/)).toBeTruthy();
+    expect((screen.getByRole('button', { name: 'Settle it' }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
   it('asks for the gold dice only on 2–6, then pays them in and can be taken back', async () => {
     const user = userEvent.setup();
     render(<Harness wb="hochland" units={['prince', 'huckster']} />);

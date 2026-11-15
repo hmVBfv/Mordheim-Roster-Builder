@@ -198,7 +198,7 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   zahlen oder zuerst jemanden entlassen. `resolveDuty` bucht das Gold (`source: 'duty:<id>'`), setzt `Model.countsTwo` (zählt in
   `totalModels` doppelt, beim Verkauf von Wyrdstone als Zeile `troll`) oder entlässt (`dismissWarrior`, `dismissMan`); `undoDuty` nimmt
   Zahlung und Doppelzählung zurück, `setDutiesDone` schließt die Phase.
-  **Würfel-Pflichten (15.11.2026):** `duties.rolled?: [{ id, rolls: Rolled[], total, outcome, text }]` hält die Regeln mit Wurf (`eye-of-the-gods`,
+  **Würfel-Pflichten (15.11.2026):** `duties.rolled?: [{ id, rolls: Rolled[], total, outcome, text, uid?, prevMark? }]` hält die Regeln mit Wurf (`eye-of-the-gods`,
   `slick-operator`; `rollDutiesDue`, `resolveRollDuty`, `undoRollDuty`, `eyeThreshold`); Gold als Fund mit `source: 'duty:<id>'`, die Mark in `Warband.mark`.
   Ein neuer optionaler Schlüssel, kein FORMAT-Wechsel; die alte App kennt ihn nicht, die Läufe der Parität setzen ihn nicht.
 - **Kampagnendatei** (eigenes Dokument, Quick Build): `{ type:

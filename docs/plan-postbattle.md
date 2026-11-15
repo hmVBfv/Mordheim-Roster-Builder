@@ -779,8 +779,11 @@ weitere Einträge der Phase anfügen, sobald Rob ihre Folgen nennt.
   Gefecht; gewonnen: +1 je Feindmodell, das der Anführer ausgeschaltet hat; Unentschieden: ohne Zuschlag. Ab 12 (Tattooed Body: 10; Norse: 13, mit Tattooed Body 11)
   wird der Anführer nach einer verlorenen Schlacht zum **Chaos Spawn** (Erfahrung, Fertigkeiten, Verletzungen, Ausrüstung weg; hat die Warband schon einen
   Spawn, wird er einfach gestrichen; das Gold bleibt wie es ist), nach einer gewonnenen wählt er eine **Mark of the Dark Gods** (`mark` der Warband). Mit Mark
-  wird nicht mehr gewürfelt; kämpfte der Anführer nicht, gilt die Regel nicht.
-- **Slick Operator** (Huckster der Hochland-Banditen): ein D6 zwischen den Spielen; 2–6: 2D6 gc für die Warband, 1: der Huckster setzt das nächste Spiel aus.
+  wird nicht mehr gewürfelt – bis der Anführer die Warband verlässt: ein neuer muss sich wieder beweisen (`markedLeader` aus den Würfen der Runden); dann ist nur die
+  Mark der Warband oder Chaos Undivided wählbar (keine zwei Marks, Undivided ausgenommen). Kämpfte der Anführer nicht, gilt die Regel nicht. Die App liest aus dem
+  Kampfprotokoll vor, was sie kann (`eyeSuggest`): Ausgang der Schlacht, eigene Helden außer Gefecht (auch tote), Ausschaltungen des Anführers (Opfer nicht aus dem
+  eigenen Roster), ob er Spiele aussetzen muss; der Spieler bestätigt oder korrigiert.
+- **Slick Operator** (Huckster der Hochland-Banditen; mordheimer.net): ein D6 zwischen den Spielen; 2–6: 2D6 gc für die Warband, 1: der Betrug fliegt auf, der Huckster setzt das nächste Spiel aus und es gibt kein Gold. Mit der Fertigkeit **Banditry** nicht kombinierbar (Regeltext der Fertigkeit): hat der Huckster sie, ist die Regel gesperrt.
 
 Die Würfel werden getippt oder in der App gewürfelt (`Rolled.by`, „rolled in the app“). Ergebnis, Würfe und Folgen stehen in `postbattle[round].duties.rolled` und als Fund mit
 Herkunft `duty:<id>`; Gold einer Regel zählt in der Statistik als „Income: other“. **Nicht umgesetzt, mit Grund:** *Looting the Dead* (Hochland-Looter: hängt von

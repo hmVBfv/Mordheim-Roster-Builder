@@ -83,7 +83,7 @@ export interface PostBattleState {
   upkeep?: { paid: { uid: string; gc: number }[]; dismissed: string[] };
   finds?: Find[];
   /** The duties of the warband settled this round (Always Hungry …) and whether the phase is done. */
-  duties?: { resolved: { id: string; option: string; gc: number }[]; done?: boolean; /** Rules that ask for a roll (Eye of the Gods, Slick Operator): the dice, the total and what came of it. */ rolled?: { id: string; rolls: Rolled[]; total: number; outcome: string; text: string }[] };
+  duties?: { resolved: { id: string; option: string; gc: number }[]; done?: boolean; /** Rules that ask for a roll (Eye of the Gods, Slick Operator): the dice, the total and what came of it. */ rolled?: { id: string; rolls: Rolled[]; total: number; outcome: string; text: string; /** The model it concerned, and the Mark the warband had before. */ uid?: number; prevMark?: string }[] };
   /** The place of the Exploration chart taken this round (N8) and the answers it was resolved with. */
   location?: { key: string; answers: Record<string, number | number[] | boolean | string> };
   [key: string]: unknown;

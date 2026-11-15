@@ -26,9 +26,10 @@ function Line({ d, acts, round }: { d: core.RollDutyLine; acts: DutyActs; round:
   const [by, setBy] = useState<'entered' | 'app'>('entered');
   const [d1, setD1] = useState<string[]>(['', '']);
   const [gold, setGold] = useState<string[]>(['', '']);
-  const [result, setResult] = useState<'won' | 'lost' | 'draw' | ''>('');
-  const [count, setCount] = useState('0');
-  const [fought, setFought] = useState(true);
+  // the battle record fills what it knows; the player confirms or corrects it
+  const [result, setResult] = useState<'won' | 'lost' | 'draw' | ''>(d.suggest?.result ?? '');
+  const [count, setCount] = useState(String(d.suggest?.count ?? 0));
+  const [fought, setFought] = useState(d.suggest?.leaderFought ?? true);
   const [mark, setMark] = useState('');
   const eye = d.kind === 'eye';
   const dice = (v: string[], n: number) => { const x = v.slice(0, n).map(dieOf); return x.every((k) => k !== null) && x.length === n ? (x as number[]) : null; };
@@ -41,7 +42,8 @@ function Line({ d, acts, round }: { d: core.RollDutyLine; acts: DutyActs; round:
   const total = eye && fought && rolled && result && /^\d+$/.test(count) ? rolled[0]! + rolled[1]! + (result === 'draw' ? 0 : Number(count)) : null;
   const need = core.eyeThreshold(acts.ctx);
   const wantsMark = eye && total !== null && total >= need && result === 'won';
-  const marks = acts.ctx.data.MARAUDER_MARKS;
+  // a warband that follows a Mark may take only that one, or Chaos Undivided
+  const marks = acts.ctx.data.MARAUDER_MARKS.filter(([k]) => !acts.ctx.s.mark || k === acts.ctx.s.mark || k === 'undivided');
   const track = (set: (v: string[]) => void) => (n: string[], b?: 'app') => { set(n); setBy(b ?? 'entered'); };
 
   if (d.resolved) {
@@ -56,6 +58,8 @@ function Line({ d, acts, round }: { d: core.RollDutyLine; acts: DutyActs; round:
     <fieldset className={styles.scenario}>
       <legend>{d.title}</legend>
       <p>{d.text}</p>
+      {d.blocked && <p className={styles.warn}>{d.blocked}</p>}
+      {eye && d.suggest && <p className={ui.muted}>{d.suggest.from}</p>}
       {eye && (
         <label className={ui.row}><input type="checkbox" checked={fought} onChange={(e) => setFought(e.target.checked)} /> The leader fought in the battle</label>
       )}
@@ -86,9 +90,9 @@ function Line({ d, acts, round }: { d: core.RollDutyLine; acts: DutyActs; round:
           )}
         </>
       )}
-      {problem && (rolled || !eye || !fought) && <p className={styles.warn}>{problem}</p>}
+      {problem && !d.blocked && (rolled || !eye || !fought) && <p className={styles.warn}>{problem}</p>}
       <div className={ui.row}>
-        <button type="button" className={ui.button} disabled={!!problem} onClick={() => acts.edit((c) => core.resolveRollDuty(c, round, d.id, input), `${d.title}.`, { gold: 'keep' })}>Settle it</button>
+        <button type="button" className={ui.button} disabled={!!problem || !!d.blocked} onClick={() => acts.edit((c) => core.resolveRollDuty(c, round, d.id, input), `${d.title}.`, { gold: 'keep' })}>Settle it</button>
       </div>
     </fieldset>
   );
