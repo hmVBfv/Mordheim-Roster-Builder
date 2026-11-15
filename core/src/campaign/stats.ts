@@ -5,6 +5,7 @@ import type { WarbandState } from '../state/types.ts';
 import type { PostBattleState } from './postbattle.ts';
 import type { Ctx } from '../rules/context.ts';
 import { goldCurrent, goldTreasury, isHeroModel } from '../rules/costs.ts';
+import { unitDef } from '../rules/lookup.ts';
 import { warbandWorth } from '../rules/worth.ts';
 
 export interface StageMetrics {
@@ -90,4 +91,25 @@ export function stageMetrics(ctx: Ctx): StageMetrics {
     rareCarried: s.models.reduce((t, m) => t + Object.keys(m.rare ?? {}).length, 0),
     rareStash: (s.stash?.items ?? []).filter((it) => it.rare).reduce((t, it) => t + (num(it.qty) || 1), 0),
   };
+}
+
+/** One roster entry at a mark: a Hero, or a group of henchmen (which earns its experience together). */
+export interface WarriorMetrics { uid: number; label: string; unit: string; hero: boolean; exp: number }
+/** Who has what at a mark, and who fell, by unit (P14, stage 4): the numbers per warrior that `stageMetrics` can only add up. */
+export interface WarriorsAt { warriors: WarriorMetrics[]; fallen: { unit: string; count: number }[] }
+
+/** The experience of every entry of the roster and the dead by unit, as the state stands now. Dead Heroes are in `fallen`, not in `warriors`. */
+export function warriorMetrics(ctx: Ctx): WarriorsAt {
+  const s: WarbandState = ctx.s;
+  const name = (uidDef: string) => unitDef(ctx, uidDef)?.name || uidDef;
+  const warriors = s.models.filter((m) => !unitDef(ctx, m.uid_def)?.noxp).map((m) => {
+    const hero = isHeroModel(ctx, m);
+    return { uid: m.uid, label: m.name || name(m.uid_def), unit: name(m.uid_def), hero, exp: num(m.exp) };
+  });
+  const counts = new Map<string, number>();
+  for (const f of s.fallen ?? []) {
+    const unit = name(f.m?.uid_def ?? f.uid_def ?? '');
+    counts.set(unit, (counts.get(unit) ?? 0) + 1);
+  }
+  return { warriors, fallen: [...counts].map(([unit, count]) => ({ unit, count })).sort((a, b) => b.count - a.count || a.unit.localeCompare(b.unit)) };
 }

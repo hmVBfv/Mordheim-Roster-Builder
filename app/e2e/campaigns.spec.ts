@@ -391,7 +391,8 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     c.enrolments.forEach((e, k) => {
       const start = e.tags![0]!;
       const marks = [1, 2, 3].map((n) => ({ ...start, id: `tag-${k}-${n}`, kind: 'after_battle' as const, round: n, createdAt: `2026-10-0${n + 4}T12:00:00.000Z`, totals: { ...start.totals, rating: 100 + k * 10 + n * (12 + k * 5) }, metrics: { ...base, rating: 100 + k * 10 + n * (12 + k * 5), wealth: 380 + n * (40 + 25 * k), exp: 20 + n * (6 + k), income: n * (30 + 20 * k) } }));
-      e.tags = [{ ...start, metrics: base }, ...marks];
+      const warriors = (exp: number) => ({ warriors: [{ uid: 1, label: 'Brother Anselm', unit: 'Captain', hero: true, exp }, { uid: 2, label: 'Zealots', unit: 'Zealots', hero: false, exp: exp / 2 }], fallen: exp > 25 ? [{ unit: 'Zealots', count: 1 }] : [] });
+      e.tags = [{ ...start, metrics: base, warriors: warriors(20) }, ...marks.map((m, i) => ({ ...m, warriors: warriors(20 + 6 * (i + 1)) }))];
       e.tag = marks.at(-1)!;
     });
     await page.goto(`./campaign/${c.id}/statistics`);
@@ -421,6 +422,13 @@ for (const theme of ['chronicle', 'parchment'] as const) {
     await noSideScroll(page);
     await tapTargets(page);
     await shot(page, `${theme}-statistics-compare`);
+    const warriors = page.getByRole('region', { name: 'Warriors' });
+    await warriors.scrollIntoViewIfNeeded();
+    await expect(warriors.getByRole('figure', { name: /Experience of each warrior/ })).toBeVisible();
+    await expect(warriors.getByRole('row', { name: /Zealots\s+1/ })).toBeVisible();
+    await noSideScroll(page);
+    await tapTargets(page);
+    await shot(page, `${theme}-statistics-warriors`);
     const download = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Download all numbers (CSV)' }).click();
     expect((await download).suggestedFilename()).toBe('statistics.csv');

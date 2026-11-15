@@ -2,7 +2,7 @@
    warband that left had. */
 import { randomUUID } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
-import { campaignStatistics, confirmEnrolment, createCampaign, endEnrolment, enrol, setMember } from '../src/campaigns.ts';
+import { campaignStatistics, campaignWarriorStats, confirmEnrolment, createCampaign, endEnrolment, enrol, setMember } from '../src/campaigns.ts';
 import { addVersion, warbandById } from '../src/warbands.ts';
 import { startAccounts } from './accounts-helpers.ts';
 
@@ -49,5 +49,20 @@ describe('statistics of a campaign', () => {
     const kai = await s.user('kai');
     const c = createCampaign(s.db, { name: 'Empty', by: kai.id }, s.clock.now());
     expect(campaignStatistics(s.db, c.id)).toEqual([]);
+  });
+
+  it('lists the experience of each roster entry at every mark, and is empty for a campaign nobody entered', async () => {
+    const s = await startAccounts();
+    const kai = await s.user('kai');
+    const t0 = s.clock.now();
+    const c = createCampaign(s.db, { name: 'The Hel Fenn Campaign', by: kai.id }, t0);
+    expect(campaignWarriorStats(s.db, c.id)).toEqual([]);
+    const id = randomUUID();
+    const e = enrol(s.db, { campaign: c, playerId: kai.id, warbandId: id, data: save('The Grey Penitents', 12), json: JSON.stringify(save('The Grey Penitents', 12)), copiedFrom: null, appVersion: '' }, t0).enrolment;
+    expect(confirmEnrolment(s.db, c, e, kai.id, t0).ok).toBe(true);
+    const r = campaignWarriorStats(s.db, c.id);
+    expect(r.map((w) => [w.name, w.points.map((p) => [p.kind, p.round])])).toEqual([['The Grey Penitents', [['start', 0]]]]);
+    expect(r[0]!.points[0]!.warriors).toEqual([expect.objectContaining({ uid: 1, exp: 12, hero: true })]);
+    expect(r[0]!.points[0]!.fallen).toEqual([]);
   });
 });

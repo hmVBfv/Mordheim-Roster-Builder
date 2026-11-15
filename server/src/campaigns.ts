@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { audit } from './accounts.ts';
 import { listBattles, type BattleSummary } from './battles.ts';
 import type { DB } from './db.ts';
-import { gameData, metricsOf, totalsOf } from './rules.ts';
+import { gameData, metricsOf, totalsOf, warriorsOf } from './rules.ts';
 import { createWarband, versionOf, warbandById, type WarbandRow } from './warbands.ts';
 
 export const ROLES = ['leader', 'player', 'viewer'] as const;
@@ -372,6 +372,26 @@ export function campaignStatistics(db: DB, campaignId: string): WarbandStatistic
     const w = by.get(r.warband_id) ?? { warbandId: r.warband_id, name: r.name, active: !!r.active, points: [] };
     // the numbers frozen since the beginning (rating, spent, models, heroes, gold, fallen) come with them: one place for a chart to read
     w.points.push({ round: r.round, kind: r.kind, at: r.created_at, metrics: { ...(JSON.parse(r.totals) as Record<string, number>), ...metrics } });
+    by.set(r.warband_id, w);
+  }
+  return [...by.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+}
+
+/** Experience per roster entry and the dead by unit at every mark (plan P14, stage 4). Computed from the marked version, which never changes (ADR 0003),
+    so nothing is stored. Mechanics: the names are the roster's own, open to the campaign (ADR 0002); no notes, no background. */
+export interface WarriorPoint { round: number; kind: string; at: string; warriors: { uid: number; label: string; unit: string; hero: boolean; exp: number }[]; fallen: { unit: string; count: number }[] }
+export interface WarbandWarriors { warbandId: string; name: string; active: boolean; points: WarriorPoint[] }
+export function campaignWarriorStats(db: DB, campaignId: string): WarbandWarriors[] {
+  const rows = db.prepare(`SELECT t.warband_id, t.rev, coalesce(t.warband_name, w.name) AS name, t.kind, t.round, t.created_at,
+      EXISTS (SELECT 1 FROM enrolments e WHERE e.campaign_id = t.campaign_id AND e.warband_id = t.warband_id AND e.status IN ('pending', 'active')) AS active
+    FROM tags t JOIN warbands w ON w.id = t.warband_id WHERE t.campaign_id = ? AND t.superseded_by IS NULL ORDER BY t.warband_id, t.round, t.created_at`).all(campaignId) as
+    { warband_id: string; rev: number; name: string; kind: string; round: number; created_at: string; active: number }[];
+  const by = new Map<string, WarbandWarriors>();
+  for (const r of rows) {
+    const at = warriorsOf(versionOf(db, r.warband_id, r.rev)?.data) as { warriors: WarriorPoint['warriors']; fallen: WarriorPoint['fallen'] } | null;
+    if (!at) continue;
+    const w = by.get(r.warband_id) ?? { warbandId: r.warband_id, name: r.name, active: !!r.active, points: [] };
+    w.points.push({ round: r.round, kind: r.kind, at: r.created_at, warriors: at.warriors, fallen: at.fallen });
     by.set(r.warband_id, w);
   }
   return [...by.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));

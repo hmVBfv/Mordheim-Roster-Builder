@@ -179,6 +179,12 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   je Warband `points: [{ round, kind, at, metrics }]`, die Zahlen mit denen der Marke von Anfang an (`rating`, `spent`, `models`, `heroes`,
   `gold`, `fallen`) zusammen; eine Warband, die gegangen ist, steht mit dem Namen von damals (AUTHZ-6). Mechanik, offen für alle Mitglieder.
 
+  **Krieger und Gefallene (P14, Stufe 5):** `GET /campaigns/:id/statistics/warriors` (`campaign.read`, Zeile der Leak-Matrix, Vertragstest) liefert
+  je Warband `points: [{ round, kind, at, warriors: [{ uid, label, unit, hero, exp }], fallen: [{ unit, count }] }]`: die Erfahrung jedes
+  Eintrags des Rosters an der Marke (Trupps zusammen, wie sie sie verdienen) und die Gefallenen nach Einheit. Nichts wird gespeichert: `warriorMetrics`
+  rechnet aus der Version der Marke, die sich nie ändert (ADR 0003). Namen sind die des Rosters, kein Hintergrund und keine Notizen. „Battles fought"
+  (`battles`) steht nicht in der Marke, der Client zählt die Marken „nach der Schlacht" je Warband.
+
   **Schlachten und Personen (P14, Stufe 3):** `GET /campaigns/:id/statistics/battles` (`campaign.read`) liefert je Warband, wie die
   abgeschlossenen Schlachten für sie endeten (`victory`, `defeat`, `draw`, `routed`) und die im Protokoll festgehaltenen Ausfälle (`inflicted`
   zugefügt, `suffered` erlitten; Umgebung zählt nicht als Angreifer), dazu `killers`: die zehn Krieger mit den meisten Ausschaltungen. Nur
