@@ -100,6 +100,10 @@ export interface WarbandRatings { warbandId: string; name: string; active: boole
 export type StatMetrics = Record<string, number>;
 export interface WarbandStatistics { warbandId: string; name: string; active: boolean; points: { round: number; kind: string; at: string; metrics: StatMetrics }[] }
 export const readStatistics = (id: string) => api<{ statistics: WarbandStatistics[] }>(`/campaigns/${id}/statistics`);
+/** The battles by warband (server/src/campaigns.ts campaignBattleStats): how each ended for it, casualties dealt and taken, and who dealt the most. */
+export interface BattleStats { warbandId: string; name: string; active: boolean; battles: number; victory: number; defeat: number; draw: number; routed: number; inflicted: number; suffered: number }
+export interface Killer { warbandId: string; warband: string; name: string; count: number }
+export const readBattleStats = (id: string) => api<{ warbands: BattleStats[]; killers: Killer[] }>(`/campaigns/${id}/statistics/battles`);
 export const readRatings = (id: string) => api<{ ratings: WarbandRatings[] }>(`/campaigns/${id}/ratings`);
 export const readWarband = (id: string, wid: string) => api<CampaignWarband>(`/campaigns/${id}/warbands/${wid}`);
 

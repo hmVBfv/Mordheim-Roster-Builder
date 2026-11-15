@@ -30,7 +30,7 @@ async function world() {
   const u = { anna: await s.user('anna', { totp: true }), kai: await s.user('kai'), ben: await s.user('ben'), vic: await s.user('vic') };
   const as = (x: { session: () => string }) => {
     const token = x.session();
-    return (method: 'GET' | 'PUT' | 'POST' | 'DELETE', url: string, body?: unknown) => s.call({ method, url: `/api/v1${url}`, body: body ?? (method === 'GET' ? undefined : {}), token });
+    return (method: 'GET' | 'PUT' | 'POST' | 'DELETE' | 'PATCH', url: string, body?: unknown) => s.call({ method, url: `/api/v1${url}`, body: body ?? (method === 'GET' ? undefined : {}), token });
   };
   const anna = as(u.anna), kai = as(u.kai), ben = as(u.ben), vic = as(u.vic);
   const id = ((await anna('POST', '/campaigns', { name: 'The Hel Fenn Campaign' })).json() as { campaign: { id: string } }).campaign.id;
@@ -121,6 +121,25 @@ describe('marking a warband after the battle', () => {
     const m = (await kai('POST', `${url}/marks`, { warbandId: caravan, rev: two.rev })).json() as { changes: { kind: string }[] };
     expect(m.changes.map((c) => c.kind)).not.toContain('stat');
     expect(s.db.prepare("SELECT rev, superseded_by IS NOT NULL AS old FROM tags WHERE warband_id = ? AND kind = 'after_battle' ORDER BY created_at").all(caravan)).toEqual([{ rev: one.rev, old: 1 }, { rev: two.rev, old: 0 }]);
+  });
+});
+
+describe('the battles by warband for the statistics (plan P14, stage 3)', () => {
+  it('counts how each battle ended for each warband and the casualties dealt and taken; only closed battles, only what the protocol says', async () => {
+    const { id, url, caravan, skrittle, anna, ben } = await world();
+    const entry = (victim: object, attacker: object | null) => ({ turn: 2, kind: 'casualty', payload: { victim, attacker, note: '' } });
+    const ours = (name: string) => ({ warbandId: caravan, uid: 1, idx: 0, name, grade: 'hero', wb: 'merc' });
+    const theirs = (name: string) => ({ warbandId: skrittle, uid: 2, idx: 0, name, grade: 'hench', wb: 'skaven' });
+    for (const e of [entry(theirs('Gnawer'), ours('Ulrich')), entry(theirs('Skritch'), ours('Ulrich')), entry(ours('Hel'), theirs('Skritch')), entry(ours('Ada'), { name: 'The surroundings', env: true })]) await anna('PUT', `${url}/protocol/${randomUUID()}`, e);
+    await anna('PATCH', url, { outcomes: { [caravan]: 'victory', [skrittle]: 'defeat' } });
+    // not closed yet: nothing counts
+    expect((await anna('GET', `/campaigns/${id}/statistics/battles`)).json()).toEqual({ warbands: [], killers: [] });
+    await anna('POST', `${url}/close`);
+    const r = (await anna('GET', `/campaigns/${id}/statistics/battles`)).json() as { warbands: { name: string; battles: number; victory: number; defeat: number; inflicted: number; suffered: number }[]; killers: { name: string; warband: string; count: number }[] };
+    expect(r.warbands.map((w) => [w.name, w.battles, w.victory, w.defeat, w.inflicted, w.suffered])).toEqual([['Clan Skrittle', 1, 0, 1, 1, 2], ['The Silver Caravan', 1, 1, 0, 2, 2]]);
+    expect(r.killers).toEqual([{ warbandId: caravan, warband: 'The Silver Caravan', name: 'Ulrich', count: 2 }, { warbandId: skrittle, warband: 'Clan Skrittle', name: 'Skritch', count: 1 }]);
+    // every member reads the same, the outsider nothing
+    expect((await ben('GET', `/campaigns/${id}/statistics/battles`)).json()).toEqual(r);
   });
 });
 

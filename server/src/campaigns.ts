@@ -377,6 +377,40 @@ export function campaignStatistics(db: DB, campaignId: string): WarbandStatistic
   return [...by.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
 }
 
+/** The battles of a campaign by warband (plan P14, stage 3): how each ended for it, and the casualties the protocol records – dealt and taken – with
+    who dealt the most. Mechanics only, open to every member (ADR 0002): outcomes and the protocol's casualty entries, never notes or sealed text. */
+export interface BattleStats { warbandId: string; name: string; active: boolean; battles: number; victory: number; defeat: number; draw: number; routed: number; inflicted: number; suffered: number }
+export interface Killer { warbandId: string; warband: string; name: string; count: number }
+export function campaignBattleStats(db: DB, campaignId: string): { warbands: BattleStats[]; killers: Killer[] } {
+  const rows = db.prepare(`SELECT p.warband_id AS id, coalesce((SELECT t.warband_name FROM tags t WHERE t.warband_id = p.warband_id AND t.campaign_id = b.campaign_id AND t.warband_name IS NOT NULL LIMIT 1), w.name) AS name,
+      EXISTS (SELECT 1 FROM enrolments e WHERE e.campaign_id = b.campaign_id AND e.warband_id = p.warband_id AND e.status IN ('pending', 'active')) AS active,
+      count(*) AS battles, sum(p.outcome = 'victory') AS victory, sum(p.outcome = 'defeat') AS defeat, sum(p.outcome = 'draw') AS draw, sum(p.outcome = 'routed') AS routed
+    FROM battle_participants p JOIN battles b ON b.id = p.battle_id JOIN warbands w ON w.id = p.warband_id
+    WHERE b.campaign_id = ? AND b.status = 'closed' GROUP BY p.warband_id`).all(campaignId) as { id: string; name: string; active: number; battles: number; victory: number; defeat: number; draw: number; routed: number }[];
+  const out = new Map<string, BattleStats>(rows.map((r) => [r.id, { warbandId: r.id, name: r.name, active: !!r.active, battles: r.battles, victory: r.victory, defeat: r.defeat, draw: r.draw, routed: r.routed, inflicted: 0, suffered: 0 }]));
+  const entries = db.prepare(`SELECT e.payload FROM protocol_entries e JOIN battles b ON b.id = e.battle_id
+    WHERE b.campaign_id = ? AND b.status = 'closed' AND e.kind = 'casualty' AND e.deleted_at IS NULL`).all(campaignId) as { payload: string }[];
+  const killers = new Map<string, Killer>();
+  for (const e of entries) {
+    const p = JSON.parse(e.payload) as { victim?: { warbandId?: string }; attacker?: { warbandId?: string; name?: string; env?: boolean } | null };
+    const victim = p.victim?.warbandId && out.get(p.victim.warbandId);
+    if (victim) victim.suffered++;
+    const a = p.attacker;
+    const attacker = a && !a.env && a.warbandId && out.get(a.warbandId);
+    if (attacker) {
+      attacker.inflicted++;
+      const k = `${a.warbandId}:${a.name ?? ''}`;
+      const cur = killers.get(k) ?? { warbandId: a.warbandId!, warband: attacker.name, name: String(a.name ?? ''), count: 0 };
+      cur.count++;
+      killers.set(k, cur);
+    }
+  }
+  return {
+    warbands: [...out.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })),
+    killers: [...killers.values()].sort((a, b) => b.count - a.count || a.name.localeCompare(b.name)).slice(0, 10),
+  };
+}
+
 /** What each active warband of a campaign has by now, for the catch-up of a warband that joins late (wish #77): the rating and
     the value (all it owns at list prices plus its gold in hand) of its latest mark, and the closed battles it fought. No names:
     the mechanics are open to every member, and who is who stays with the campaign. */

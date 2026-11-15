@@ -7,7 +7,7 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { userById } from './accounts.ts';
 import {
-  campaignById, campaignView, campaignRatings, campaignStatistics, catchUpPeers, confirmEnrolment, createCampaign, deleteCampaign, endEnrolment, endVanilla, enrol, enrolmentById, HouseRulesBody, listCampaigns, openEnrolment,
+  campaignById, campaignView, campaignRatings, campaignBattleStats, campaignStatistics, catchUpPeers, confirmEnrolment, createCampaign, deleteCampaign, endEnrolment, endVanilla, enrol, enrolmentById, HouseRulesBody, listCampaigns, openEnrolment,
   removeMember, renameCampaign, roleIn, ROLES, setArchived, setHouseRules, setMember, setOpening, tagsOf, type CampaignRole, type CampaignRow,
 } from './campaigns.ts';
 import type { DB } from './db.ts';
@@ -205,6 +205,13 @@ export function registerCampaignRoutes(app: FastifyInstance, deps: CampaignDeps)
     const t = target(req, reply, 'campaign.read');
     if (!t) return reply;
     return { statistics: campaignStatistics(db(), t.c.id) };
+  });
+
+  // the battles by warband for the statistics (plan P14, stage 3): outcomes and the protocol's casualties, mechanics for every member
+  app.get('/api/v1/campaigns/:id/statistics/battles', { config: { action: 'campaign.read' } }, async (req, reply) => {
+    const t = target(req, reply, 'campaign.read');
+    if (!t) return reply;
+    return campaignBattleStats(db(), t.c.id);
   });
 
   /** An open enrolment of this campaign, named by the route. */

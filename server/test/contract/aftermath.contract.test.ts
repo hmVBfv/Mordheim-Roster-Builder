@@ -23,6 +23,7 @@ export const AFTERMATH_STEPS: Step[] = [
   { name: 'mark the warband', url: `/campaigns/{c}/battles/${B1}/marks`, body: { warbandId: W1, rev: 1 } },
   { name: 'the battle with its mark', url: `/campaigns/{c}/battles/${B1}` },
   { name: 'statistics with the mark', url: '/campaigns/{c}/statistics' },
+  { name: 'battle statistics', url: '/campaigns/{c}/statistics/battles' },
   { name: 'a second version', url: `/warbands/${W1}/versions`, body: { baseRev: 1, data: save('The Probes, changed', 40), source: 'save' } },
   { name: 'correct the mark with it', url: `/campaigns/{c}/battles/${B1}/marks`, body: { warbandId: W1, rev: 2 } },
   { name: 'mark with a version there is not', url: `/campaigns/{c}/battles/${B1}/marks`, body: { warbandId: W1, rev: 9 } },

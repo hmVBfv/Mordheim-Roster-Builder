@@ -367,9 +367,10 @@ export const MATRIX: Record<Action, MatrixRow> = {
       'GET /api/v1/campaigns/:id/catchup': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/catchup` }),
       'GET /api/v1/campaigns/:id/ratings': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/ratings` }),
       'GET /api/v1/campaigns/:id/statistics': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/statistics` }),
+      'GET /api/v1/campaigns/:id/statistics/battles': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/statistics/battles` }),
       'GET /api/v1/campaigns/:id/chapters/:chid': (c) => ({ method: 'GET', url: `/api/v1/campaigns/${c.campaignId}/chapters/${c.chapterId}` }),
     },
-    fields: { user: [...VIEW, ...BATTLE, 'notes', 'attachments', 'positions', 'entries', 'outcomes', 'marks', 'chapters', 'chapter', 'peers', 'round', 'ratings', 'statistics'] },
+    fields: { user: [...VIEW, ...BATTLE, 'notes', 'attachments', 'positions', 'entries', 'outcomes', 'marks', 'chapters', 'chapter', 'peers', 'round', 'ratings', 'statistics', 'warbands', 'killers'] },
   },
   'campaign.warband.read': {
     allowed: ['user'],

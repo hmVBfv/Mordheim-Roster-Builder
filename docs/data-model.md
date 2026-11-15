@@ -179,6 +179,11 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   je Warband `points: [{ round, kind, at, metrics }]`, die Zahlen mit denen der Marke von Anfang an (`rating`, `spent`, `models`, `heroes`,
   `gold`, `fallen`) zusammen; eine Warband, die gegangen ist, steht mit dem Namen von damals (AUTHZ-6). Mechanik, offen für alle Mitglieder.
 
+  **Schlachten und Personen (P14, Stufe 3):** `GET /campaigns/:id/statistics/battles` (`campaign.read`) liefert je Warband, wie die
+  abgeschlossenen Schlachten für sie endeten (`victory`, `defeat`, `draw`, `routed`) und die im Protokoll festgehaltenen Ausfälle (`inflicted`
+  zugefügt, `suffered` erlitten; Umgebung zählt nicht als Angreifer), dazu `killers`: die zehn Krieger mit den meisten Ausschaltungen. Nur
+  Ergebnisse und die Ausfall-Einträge des Protokolls, nie Notizen oder versiegelter Text; offen für alle Mitglieder (ADR 0002).
+
   **Pflichten der Warband (Rob, 14.11.2026):** Regeln, die nach jeder Schlacht eine Wahl verlangen, sind eine Phase für sich (in der App eine Phase mit dem Sold der Hired Swords, nach
   dem Verkauf von Wyrdstone, nur für eine Warband, die Pflichten oder Söldner hat; `PB_STEPS` bleibt unverändert, die Phase ist `postbattle[round].duties`
   `{ resolved: [{ id, option, gc }], done? }`). `PB_DUTIES` (`data/postbattle.json`): der **Troll** der Black Orcs (20 gc, oder zählt als zwei
