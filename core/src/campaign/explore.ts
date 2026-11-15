@@ -103,6 +103,11 @@ export function exploreAllowances(ctx: Ctx, round: number): Allowance[] {
     }
     if (from) out.push({ id: r.id, name: r.name, from, dice: r.dice ?? 0, reroll: r.reroll ?? 0, adjust: r.adjust ?? 0, drop: r.drop ?? 0, text: r.text });
   }
+  // lasting advantages won at places of the chart (N8): a catacomb entrance re-rolls every time, the straggler's insight once
+  for (const p of s.campaign?.perks ?? []) {
+    if (!p.explore || p.used) continue;
+    out.push({ id: `perk:${p.id}`, name: p.id === 'catacombs-entrance' ? 'Entrance to the catacombs' : p.id === 'straggler' ? 'The straggler’s insight' : p.id, from: `place found in round ${p.round}`, dice: p.explore.dice ?? 0, reroll: p.explore.reroll ?? 0, adjust: 0, drop: p.explore.drop ?? 0, text: p.text });
+  }
   return out;
 }
 
@@ -166,6 +171,10 @@ export function recordExploration(ctx: Ctx, round: number, input: ExploreInput):
   return update(ctx, (d, c) => {
     const rec = postbattleOn(d, c, round);
     takeBack(d as unknown as WarbandState, rec);
+    for (const id of input.used ?? []) {
+      const p = id.startsWith('perk:') ? (d.campaign?.perks ?? []).find((x) => x.id === id.slice(5) && !x.used) : undefined;
+      if (p && !p.unique) p.used = true;
+    }
     d.stash = d.stash ?? { wyrd: 0, gold: null, items: [] };
     d.stash.wyrd = (Number(d.stash.wyrd) || 0) + result.shards;
     const text = `Explored with ${kept.join(', ')} (${result.total}): ${result.shards} shard${result.shards === 1 ? '' : 's'}${result.location ? `, an unusual place (${result.location})` : ''}.`;

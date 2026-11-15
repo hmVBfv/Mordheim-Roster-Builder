@@ -124,6 +124,7 @@ export const campaignSchema = z.looseObject({
   on: z.boolean().optional(),
   round: z.number().optional(),
   districts: z.record(z.string(), z.string()).optional(),
+  perks: z.array(z.looseObject({ id: z.string(), text: z.string(), round: z.number(), key: z.string(), uid: z.number().optional(), unique: z.boolean().optional(), used: z.boolean().optional() })).optional(),
   log: z.array(logEntrySchema).optional(),
   // serverId: the campaign server's battle it was taken over from; xpAwarded: its experience granted once (phase 4a4, ADR 0016)
   battles: z.array(z.looseObject({ id: z.number(), serverId: z.string().optional(), xpAwarded: z.boolean().optional() })).optional(),

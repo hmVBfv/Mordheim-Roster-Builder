@@ -128,3 +128,19 @@ describe('every mention of the exploration in the data is a rule or an exception
     for (const [needle, why] of data.PB_EXPLORE_EXCEPTIONS) { expect(needle.length).toBeGreaterThan(8); expect(why.length, needle).toBeGreaterThan(20); }
   });
 });
+
+describe('lasting advantages of the places (N8)', () => {
+  const withPerk = (perk: object) => band((s) => ({ ...s, campaign: { ...s.campaign, perks: [perk] } }) as WarbandState);
+  it('an Entrance to the Catacombs re-rolls one die, every time', () => {
+    const { s } = withPerk({ id: 'catacombs-entrance', text: 'x', round: 1, key: '6 6 6 6 6', unique: true, explore: { reroll: 1 } });
+    expect(core.exploreAllowances(ctx(s), 2)).toMatchObject([{ id: 'perk:catacombs-entrance', reroll: 1 }]);
+    const t = core.recordExploration(ctx(s), 2, { rolled: [3], by: 'entered', used: ['perk:catacombs-entrance'] });
+    expect(core.exploreAllowances(ctx(t), 3).map((a) => a.id)).toEqual(['perk:catacombs-entrance']);
+  });
+  it('the straggler’s insight is used once: a die more, one discarded – then it is gone', () => {
+    const { s } = withPerk({ id: 'straggler', text: 'x', round: 1, key: '4 4', explore: { dice: 1, drop: 1 } });
+    expect(core.exploreAllowances(ctx(s), 2)).toMatchObject([{ id: 'perk:straggler', dice: 1, drop: 1 }]);
+    const t = core.recordExploration(ctx(s), 2, { rolled: [3, 4], by: 'entered', used: ['perk:straggler'] });
+    expect(core.exploreAllowances(ctx(t), 3)).toEqual([]);
+  });
+});

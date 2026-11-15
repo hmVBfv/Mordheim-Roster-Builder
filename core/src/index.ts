@@ -40,6 +40,7 @@ export * from './campaign/postbattle.ts';
 export * from './campaign/analysis.ts';
 export * from './campaign/explore.ts';
 export * from './campaign/locations.ts';
+export * from './campaign/locationApply.ts';
 export * from './campaign/file.ts';
 export * from './campaign/forms.ts';
 export * from './campaign/opponents.ts';
