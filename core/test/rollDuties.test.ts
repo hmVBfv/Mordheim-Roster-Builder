@@ -21,10 +21,9 @@ function huckster(): WarbandState {
 }
 
 describe('Eye of the Gods', () => {
-  it('is due for the leader of a Marauders warband without a Mark, and nowhere else', () => {
+  it('is due for the leader of a Marauders warband, and nowhere else', () => {
     const s = marauders();
     expect(core.rollDutiesDue(ctx(s), 1).map((d) => [d.id, d.resolved])).toEqual([['eye-of-the-gods', null]]);
-    expect(core.rollDutiesDue(ctx({ ...s, mark: 'eagle' }), 1)).toEqual([]);
     expect(core.rollDutiesDue(ctx(core.newWarband(data, 'merc')), 1)).toEqual([]);
   });
 
@@ -178,5 +177,30 @@ describe('Slick Operator and Banditry', () => {
     expect(core.rollDutyProblem(ctx(t), 1, 'slick-operator', { roll: dice(1) })).toMatch(/Banditry/);
     expect(core.resolveRollDuty(ctx(t), 1, 'slick-operator', { roll: dice(1) })).toBe(t);
     expect(core.rollDutiesDue(ctx(s), 1)[0]!.blocked).toBeUndefined();
+  });
+});
+
+describe('a Mark the Seer chose is the warband’s, not the leader’s', () => {
+  const seerMark = (): WarbandState => ({ ...marauders('kurgan', ['seer']), mark: 'serpent' });
+
+  it('the Chieftain still rolls, and a win may give him only that Mark or Chaos Undivided', () => {
+    const s = seerMark();
+    expect(core.rollDutiesDue(ctx(s), 1).map((d) => d.id)).toEqual(['eye-of-the-gods']);
+    const input = { result: 'won' as const, count: 3, roll: dice(5, 4) };
+    expect(core.rollDutyProblem(ctx(s), 1, 'eye-of-the-gods', { ...input, mark: 'crow' })).toMatch(/already follows a Mark/);
+    expect(core.rollDutyProblem(ctx(s), 1, 'eye-of-the-gods', { ...input, mark: 'serpent' })).toBeNull();
+    const t = core.resolveRollDuty(ctx(s), 1, 'eye-of-the-gods', { ...input, mark: 'serpent' });
+    expect(t.mark).toBe('serpent');
+    expect(core.rollDutiesDue(ctx(t), 2)).toEqual([]); // now it is his: no more rolling
+  });
+
+  it('a leader who already has the warband’s Mark says so: no roll, and no more tests', () => {
+    const s = seerMark();
+    const t = core.resolveRollDuty(ctx(s), 1, 'eye-of-the-gods', { alreadyMarked: true });
+    expect(rec(t)!.duties!.rolled![0]).toMatchObject({ outcome: 'has-mark' });
+    expect(t.mark).toBe('serpent');
+    expect(core.rollDutiesDue(ctx(t), 2)).toEqual([]);
+    expect(core.rollDutyProblem(ctx(marauders()), 1, 'eye-of-the-gods', { alreadyMarked: true })).toBe('The warband has no Mark.');
+    expect(core.rollDutiesDue(ctx(core.undoRollDuty(ctx(t), 1, 'eye-of-the-gods')), 1)[0]!.resolved).toBeNull();
   });
 });

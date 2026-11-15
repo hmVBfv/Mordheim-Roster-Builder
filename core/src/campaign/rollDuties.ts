@@ -43,6 +43,8 @@ export interface RollDutyInput {
   roll?: Rolled;
   /** Slick Operator on 2–6: the 2D6 of gold. */
   gold?: Rolled;
+  /** Eye of the Gods: the leader already has the warband's Mark (from before the app, or by his own choice): no roll, the test is no longer taken. */
+  alreadyMarked?: boolean;
   /** Eye of the Gods, won, on the threshold: the Mark the leader chooses (a key of MARAUDER_MARKS). */
   mark?: string;
 }
@@ -70,7 +72,7 @@ const outcomeOf = (ctx: Ctx, round: number): 'won' | 'lost' | 'draw' | undefined
 export function markedLeader(ctx: Ctx): number | null {
   const rounds = Object.entries((ctx.s.campaign as { postbattle?: Record<string, PostBattleState> } | undefined)?.postbattle ?? {}).sort((a, b) => Number(a[0]) - Number(b[0]));
   let uid: number | null = null;
-  for (const [, p] of rounds) for (const r of p?.duties?.rolled ?? []) if (r.id === ids.eye && r.outcome === 'mark' && r.uid != null) uid = r.uid;
+  for (const [, p] of rounds) for (const r of p?.duties?.rolled ?? []) if (r.id === ids.eye && (r.outcome === 'mark' || r.outcome === 'has-mark') && r.uid != null) uid = r.uid;
   return uid;
 }
 
@@ -99,10 +101,10 @@ export function rollDutiesDue(ctx: Ctx, round: number): RollDutyLine[] {
     const r = done.find((x) => x.id === ids[kind]);
     out.push({ id: ids[kind], kind, title, text, uid, resolved: r ? { outcome: r.outcome, total: r.total, text: r.text } : null, ...extra });
   };
-  // with a Mark the test is no longer taken – until the leader leaves and a new one must prove himself; this round's result stays shown
-  if (ctx.s.wb === 'maraudersofchaos' && (!ctx.s.mark || (markedLeader(ctx) !== null && markedLeader(ctx) !== leaderUid(ctx)) || done.some((x) => x.id === ids.eye))) {
+  // the test is taken until THIS leader has a Mark through the Eye (one a Seer chose when hired is the warband's Mark, not his); a new leader must prove himself again; this round's result stays shown
+  if (ctx.s.wb === 'maraudersofchaos' && (markedLeader(ctx) !== leaderUid(ctx) || done.some((x) => x.id === ids.eye))) {
     const lead = leaderUid(ctx);
-    if (lead != null) line('eye', 'Eye of the Gods', `Roll 2D6 after the battle, plus 1 for each of your Heroes taken out of action if you lost, or for each enemy model the leader took out of action if you won. On ${eyeThreshold(ctx)}+ a lost battle turns the leader into a Chaos Spawn, a won one lets him choose a Mark of the Dark Gods. Not in effect if the leader did not fight.${ctx.s.mark ? ' The leader already has a Mark: a new leader must prove himself the same way.' : ''}`, lead, { suggest: eyeSuggest(ctx, round) });
+    if (lead != null) line('eye', 'Eye of the Gods', `Roll 2D6 after the battle, plus 1 for each of your Heroes taken out of action if you lost, or for each enemy model the leader took out of action if you won. On ${eyeThreshold(ctx)}+ a lost battle turns the leader into a Chaos Spawn, a won one lets him choose a Mark of the Dark Gods. Not in effect if the leader did not fight.${ctx.s.mark ? ' The warband follows a Mark (a Seer chooses it when hired): the leader may take only that one, or Chaos Undivided.' : ''}`, lead, { suggest: eyeSuggest(ctx, round) });
   }
   const hs = ctx.s.wb === 'hochland' ? ctx.s.models.find((m) => m.uid_def === 'huckster') : undefined;
   if (hs) {
@@ -120,6 +122,7 @@ export function rollDutyProblem(ctx: Ctx, round: number, id: string, input: Roll
   if (d.resolved) return 'This is settled: take it back first.';
   if (d.blocked) return d.blocked;
   if (d.kind === 'eye') {
+    if (input.alreadyMarked) return ctx.s.mark ? null : 'The warband has no Mark.';
     if (input.leaderFought === false) return null;
     if (!input.result) return 'Say how the battle ended.';
     if (!diceOk(input.roll, 2)) return 'Enter the two dice.';
@@ -144,7 +147,8 @@ export function resolveRollDuty(ctx: Ctx, round: number, id: string, input: Roll
   let s = ctx.s, outcome = 'nothing', text = '', total: number | undefined, gc = 0, prevMark: string | undefined;
   const rolls: Rolled[] = [];
   if (d.kind === 'eye') {
-    if (input.leaderFought === false) { outcome = 'not-in-effect'; text = 'The leader did not fight: the Eye of the Gods is not in effect.'; }
+    if (input.alreadyMarked) { outcome = 'has-mark'; text = 'The leader already has the warband\'s Mark: the Eye of the Gods is no longer taken.'; }
+    else if (input.leaderFought === false) { outcome = 'not-in-effect'; text = 'The leader did not fight: the Eye of the Gods is not in effect.'; }
     else {
       const need = eyeThreshold(ctx);
       total = sum(input.roll) + (input.result === 'draw' ? 0 : input.count!);

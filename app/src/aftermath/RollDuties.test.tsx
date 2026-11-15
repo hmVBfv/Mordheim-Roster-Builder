@@ -126,3 +126,20 @@ describe('Slick Operator', () => {
     expect((screen.getByLabelText('D6') as HTMLInputElement).value).toMatch(/^[1-6]$/);
   });
 });
+
+describe('a Mark the Seer chose', () => {
+  it('the Chieftain still rolls; he may say he already has the warband’s Mark, and is then no longer asked', async () => {
+    const user = userEvent.setup();
+    function Seer() {
+      const [st, setSt] = useState(() => ({ ...warband('maraudersofchaos', ['chieftain', 'seer']), mark: 'serpent' }) as WarbandState);
+      const ctx = core.ctxOf(data, st);
+      return <DutiesStep a={aftermathView(data, st, 'b-1')!} acts={{ ctx, edit: (f) => setSt(f(ctx)) }} />;
+    }
+    render(<Seer />);
+    expect(screen.getByRole('group', { name: 'Eye of the Gods' })).toBeTruthy();
+    expect(screen.getByText(/Chaos Undivided/)).toBeTruthy();
+    await user.click(screen.getByRole('checkbox', { name: /already has the warband’s Mark/ }));
+    await user.click(screen.getByRole('button', { name: 'Settle it' }));
+    expect(screen.getByText(/no longer taken/)).toBeTruthy();
+  });
+});

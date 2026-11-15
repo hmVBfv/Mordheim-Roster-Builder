@@ -31,11 +31,12 @@ function Line({ d, acts, round }: { d: core.RollDutyLine; acts: DutyActs; round:
   const [count, setCount] = useState(String(d.suggest?.count ?? 0));
   const [fought, setFought] = useState(d.suggest?.leaderFought ?? true);
   const [mark, setMark] = useState('');
+  const [has, setHas] = useState(false);
   const eye = d.kind === 'eye';
   const dice = (v: string[], n: number) => { const x = v.slice(0, n).map(dieOf); return x.every((k) => k !== null) && x.length === n ? (x as number[]) : null; };
   const rolled = dice(d1, eye ? 2 : 1), goldDice = dice(gold, 2);
   const input: core.RollDutyInput = eye
-    ? (fought ? { result: result || undefined, count: /^\d+$/.test(count) ? Number(count) : -1, roll: rolled ? { value: rolled, by } : undefined, mark: mark || undefined } : { leaderFought: false })
+    ? (has ? { alreadyMarked: true } : fought ? { result: result || undefined, count: /^\d+$/.test(count) ? Number(count) : -1, roll: rolled ? { value: rolled, by } : undefined, mark: mark || undefined } : { leaderFought: false })
     : { roll: rolled ? { value: rolled, by } : undefined, gold: goldDice ? { value: goldDice, by } : undefined };
   const problem = core.rollDutyProblem(acts.ctx, round, d.id, input);
   const slickGold = !eye && rolled && rolled[0]! >= 2;
@@ -60,10 +61,13 @@ function Line({ d, acts, round }: { d: core.RollDutyLine; acts: DutyActs; round:
       <p>{d.text}</p>
       {d.blocked && <p className={styles.warn}>{d.blocked}</p>}
       {eye && d.suggest && <p className={ui.muted}>{d.suggest.from}</p>}
-      {eye && (
+      {eye && acts.ctx.s.mark && (
+        <label className={ui.row}><input type="checkbox" checked={has} onChange={(e) => setHas(e.target.checked)} /> The leader already has the warband’s Mark (no roll)</label>
+      )}
+      {eye && !has && (
         <label className={ui.row}><input type="checkbox" checked={fought} onChange={(e) => setFought(e.target.checked)} /> The leader fought in the battle</label>
       )}
-      {(!eye || fought) && (
+      {(!eye || (fought && !has)) && (
         <>
           {eye && (
             <>

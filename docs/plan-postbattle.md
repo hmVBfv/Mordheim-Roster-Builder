@@ -778,8 +778,9 @@ weitere Einträge der Phase anfügen, sobald Rob ihre Folgen nennt.
 - **Eye of the Gods** (Marauders of Chaos, mordheimer.net, Special Rules, Tattooed Body, Norse): 2D6 nach jeder Schlacht; verloren: +1 je eigenem Helden außer
   Gefecht; gewonnen: +1 je Feindmodell, das der Anführer ausgeschaltet hat; Unentschieden: ohne Zuschlag. Ab 12 (Tattooed Body: 10; Norse: 13, mit Tattooed Body 11)
   wird der Anführer nach einer verlorenen Schlacht zum **Chaos Spawn** (Erfahrung, Fertigkeiten, Verletzungen, Ausrüstung weg; hat die Warband schon einen
-  Spawn, wird er einfach gestrichen; das Gold bleibt wie es ist), nach einer gewonnenen wählt er eine **Mark of the Dark Gods** (`mark` der Warband). Mit Mark
-  wird nicht mehr gewürfelt – bis der Anführer die Warband verlässt: ein neuer muss sich wieder beweisen (`markedLeader` aus den Würfen der Runden); dann ist nur die
+  Spawn, wird er einfach gestrichen; das Gold bleibt wie es ist), nach einer gewonnenen wählt er eine **Mark of the Dark Gods** (`mark` der Warband). Eine Mark, die der
+  Seer beim Anwerben gewählt hat, ist die der Warband, nicht die des Anführers: der Chieftain würfelt weiter und darf nur diese Mark oder Chaos Undivided nehmen
+  (hat er sie schon, sagt er es: kein Wurf mehr, `alreadyMarked`). Hat der Anführer seine Mark, wird nicht mehr gewürfelt – bis er die Warband verlässt: ein neuer muss sich wieder beweisen (`markedLeader` aus den Würfen der Runden); dann ist nur die
   Mark der Warband oder Chaos Undivided wählbar (keine zwei Marks, Undivided ausgenommen). Kämpfte der Anführer nicht, gilt die Regel nicht. Die App liest aus dem
   Kampfprotokoll vor, was sie kann (`eyeSuggest`): Ausgang der Schlacht, eigene Helden außer Gefecht (auch tote), Ausschaltungen des Anführers (Opfer nicht aus dem
   eigenen Roster), ob er Spiele aussetzen muss; der Spieler bestätigt oder korrigiert.
