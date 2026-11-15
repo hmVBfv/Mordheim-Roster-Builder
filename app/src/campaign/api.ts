@@ -96,6 +96,10 @@ export const setHouseRules = (id: string, rules: Record<string, unknown>) => api
 export const advanceRound = (id: string) => api<CampaignView>(`/campaigns/${id}/rounds/advance`, { body: {} }).then(keep());
 /** The rating of each warband of a campaign over its marks (server/src/campaigns.ts campaignRatings). */
 export interface WarbandRatings { warbandId: string; name: string; active: boolean; points: { round: number; kind: string; rating: number; at: string }[] }
+/** The numbers of every mark of each warband, for the statistics (server/src/campaigns.ts campaignStatistics): the totals frozen with it and core's stageMetrics (P14). */
+export type StatMetrics = Record<string, number>;
+export interface WarbandStatistics { warbandId: string; name: string; active: boolean; points: { round: number; kind: string; at: string; metrics: StatMetrics }[] }
+export const readStatistics = (id: string) => api<{ statistics: WarbandStatistics[] }>(`/campaigns/${id}/statistics`);
 export const readRatings = (id: string) => api<{ ratings: WarbandRatings[] }>(`/campaigns/${id}/ratings`);
 export const readWarband = (id: string, wid: string) => api<CampaignWarband>(`/campaigns/${id}/warbands/${wid}`);
 

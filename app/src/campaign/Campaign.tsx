@@ -30,6 +30,7 @@ import { HistorySection } from './History.tsx';
 import { NotesTab } from '../notes/Notes.tsx';
 import { TimelineTab } from '../timeline/Timeline.tsx';
 import { ChronicleTab } from '../chronicle/Chronicle.tsx';
+import { StatisticsTab } from '../statistics/StatisticsTab.tsx';
 import { StyleSection } from '../pack/StyleSection.tsx';
 import { CanonSection } from '../canon/CanonSection.tsx';
 import { campaignMap } from './map.ts';
@@ -359,6 +360,7 @@ export function Campaign() {
   const notes = tab === 'notes';
   const timeline = tab === 'timeline';
   const chronicle = tab === 'chronicle';
+  const statistics = tab === 'statistics';
   const questions = tab === 'questions' && view.role !== 'viewer';
   const world = tab === 'world';
   const warbands = tab === 'warbands';
@@ -374,6 +376,7 @@ export function Campaign() {
     : asPlayer ? <AsPlayerTab id={id} view={view} />
     : timeline ? <TimelineTab id={id} view={view} user={user} lead={lead} />
     : chronicle ? <ChronicleTab id={id} view={view} lead={lead} />
+    : statistics ? <StatisticsTab id={id} />
     : <Overview id={id} view={view} me={user.id} lead={lead} onView={setView} />;
   // the tabs of text and forms keep a measure; those of cards and lists (overview, warbands, world) take the whole width
   const prose = manage || notes || timeline || chronicle || questions || background || asPlayer;

@@ -1,10 +1,10 @@
 /* Contract, area 11: after a battle – confirming the version that fights, closing, marking the warband with what changed, correcting the mark
    (server/src/aftermath.ts through routes-battles.ts). The fake takes the changes from core as the server does. The signed-in user leads the
    campaign; the warband's second version changes its name. Plan P5. */
-import { battleEvidence, ctxOf, diffWarbands, loadSave, postBattleSummary, reconcile } from '@mordheim/core';
+import { battleEvidence, diffWarbands, loadSave, reconcile } from '@mordheim/core';
 import { describe, expect, it } from 'vitest';
 import { startAccounts } from '../accounts-helpers.ts';
-import { gameData, totalsOf } from '../../src/rules.ts';
+import { gameData, metricsOf, summaryOf, totalsOf } from '../../src/rules.ts';
 import { compare, fakeSide, serverSide, type Step } from './driver.ts';
 
 const save = (name: string, gold?: number) => ({ wb: 'merc', name, models: [], format: 2, ...(gold === undefined ? {} : { gold }) });
@@ -22,6 +22,7 @@ export const AFTERMATH_STEPS: Step[] = [
   { name: 'close the battle', url: `/campaigns/{c}/battles/${B1}/close`, body: {} },
   { name: 'mark the warband', url: `/campaigns/{c}/battles/${B1}/marks`, body: { warbandId: W1, rev: 1 } },
   { name: 'the battle with its mark', url: `/campaigns/{c}/battles/${B1}` },
+  { name: 'statistics with the mark', url: '/campaigns/{c}/statistics' },
   { name: 'a second version', url: `/warbands/${W1}/versions`, body: { baseRev: 1, data: save('The Probes, changed', 40), source: 'save' } },
   { name: 'correct the mark with it', url: `/campaigns/{c}/battles/${B1}/marks`, body: { warbandId: W1, rev: 2 } },
   { name: 'mark with a version there is not', url: `/campaigns/{c}/battles/${B1}/marks`, body: { warbandId: W1, rev: 9 } },
@@ -46,7 +47,8 @@ describe('contract: after a battle', () => {
     const fake = fakeSide({
       me: { id: 'u1', username: 'kai', displayName: 'Kai' },
       totals: (save) => { const t = totalsOf(save); return { rating: t?.rating ?? 0, spent: t?.spent ?? 0, models: t?.models ?? 0, heroes: t?.heroes ?? 0, gold: t?.gold ?? 0, fallen: t?.fallen ?? 0 }; },
-      summary: (save, round) => { const r = loadSave(gameData(), save); return r.ok ? postBattleSummary(ctxOf(gameData(), r.state), round) : null; },
+      metrics: (save) => metricsOf(save),
+      summary: (save, round) => summaryOf(save, round),
       wbName: (wb) => (gameData().WARBANDS as Record<string, { name?: string }>)[wb]?.name ?? wb,
       changes: (before, after, battle) => {
         const sb = read(before), sa = read(after);
