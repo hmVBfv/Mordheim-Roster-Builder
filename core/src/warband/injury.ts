@@ -148,8 +148,8 @@ function missGames(m: Model, n: number, why: string): void {
 
 /** Gold in or out because of an injury: booked when the ledger is kept,
     else straight into the treasury, as the Roster Builder does. */
-function goldOn(d: WarbandDraft, c: Ctx, amount: number, text: string): void {
-  if (Array.isArray(d.ledger)) bookOn(d, c, 'adjust', amount, { text });
+function goldOn(d: WarbandDraft, c: Ctx, amount: number, text: string, source?: string): void {
+  if (Array.isArray(d.ledger)) { const e = bookOn(d, c, 'adjust', amount, { text }); if (e && source) e.source = source; }
   else {
     d.stash = d.stash || { wyrd: 0, gold: null, items: [] };
     d.stash.gold = Math.max(0, goldTreasury(c) + amount);
@@ -220,7 +220,7 @@ function applyHero(d: WarbandDraft, c: Ctx, uid: number, r: HeroRoll, cas: Casua
     case '35': missGames(m, Number(r.games) || 1, injName(c, '35')); return 'injured';
     case '36': {
       const lost = stripGearSettled(d, c, m, false);
-      logEvent(d, 'injury', `${nm} was Robbed — all his equipment is lost (${lost} gc).`, { uid: m.uid, uid_def: m.uid_def });
+      logEvent(d, 'injury', `${nm} was Robbed — all his equipment is lost (${lost} gc).`, { uid: m.uid, uid_def: m.uid_def, cause: 'robbed', gold: -lost });
       return 'injured';
     }
     case '41-55': return 'recovered';
@@ -235,19 +235,22 @@ function applyHero(d: WarbandDraft, c: Ctx, uid: number, r: HeroRoll, cas: Casua
         killHeroOn(d, c, uid, `${nm} was Captured and never returned. He and his equipment are lost.`, cas);
         return 'dead';
       }
-      if (r.captured?.fate === 'ransomed' && r.captured.gold > 0) goldOn(d, c, -r.captured.gold, `Ransom for ${nm}`);
+      if (r.captured?.fate === 'ransomed' && r.captured.gold > 0) {
+        goldOn(d, c, -r.captured.gold, `Ransom for ${nm}`);
+        logEvent(d, 'injury', `${nm} was ransomed for ${r.captured.gold} gc.`, { uid: m.uid, uid_def: m.uid_def, cause: 'ransom', gold: -r.captured.gold });
+      }
       if (r.captured?.fate === 'held') m.captive = { by: String(r.captured.by ?? '').trim(), round: Number(campState(d).round) || 0 };
       return 'injured';
     case '65':
       if (dist.amphitheatre || r.pit?.won) {
-        goldOn(d, c, 50, `${nm} won his pit fight`);
+        goldOn(d, c, 50, `${nm} won his pit fight`, 'pit');
         m.exp = (Number(m.exp) || 0) + 2;
-        logEvent(d, 'injury', `${nm} won his pit fight — +50 gc, +2 experience.`, { uid: m.uid, uid_def: m.uid_def });
+        logEvent(d, 'injury', `${nm} won his pit fight — +50 gc, +2 experience.`, { uid: m.uid, uid_def: m.uid_def, cause: 'pit-won', gold: 50 });
         return 'injured';
       }
       {
         const lost = stripGearSettled(d, c, m, true);
-        logEvent(d, 'injury', `${nm} lost his pit fight — his weapons and armour are gone (${lost} gc).`, { uid: m.uid, uid_def: m.uid_def });
+        logEvent(d, 'injury', `${nm} lost his pit fight — his weapons and armour are gone (${lost} gc).`, { uid: m.uid, uid_def: m.uid_def, cause: 'pit-lost', gold: -lost });
         const o = r.pit && !r.pit.won ? applyHero(d, c, uid, r.pit.then, cas) : 'injured';
         return o === 'recovered' ? 'injured' : o;
       }
@@ -366,7 +369,7 @@ export function releaseCaptive(ctx: Ctx, uid: number, fate: CaptiveFate): Warban
     } else {
       delete m.captive;
       if (fate.fate === 'ransomed' && fate.gold > 0) goldOn(d, c, -fate.gold, `Ransom for ${nm}`);
-      logEvent(d, 'injury', `${nm} ${fate.fate === 'ransomed' ? `was ransomed for ${fate.gold} gc` : 'was exchanged'} and returns with all his equipment.`, { uid: m.uid, uid_def: m.uid_def });
+      logEvent(d, 'injury', `${nm} ${fate.fate === 'ransomed' ? `was ransomed for ${fate.gold} gc` : 'was exchanged'} and returns with all his equipment.`, { uid: m.uid, uid_def: m.uid_def, ...(fate.fate === 'ransomed' && fate.gold > 0 ? { cause: 'ransom', gold: -fate.gold } : {}) });
       if (cas) {
         cas.detail = heroRollText(c, roll);
         cas.injury = { hero: roll };

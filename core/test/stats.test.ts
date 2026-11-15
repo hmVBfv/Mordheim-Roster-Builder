@@ -100,3 +100,35 @@ describe('warriorMetrics', () => {
     expect(JSON.stringify(s)).toBe(frozen);
   });
 });
+
+describe('gold lost without a death, and won in the Pits', () => {
+  const campaign = (s: WarbandState): WarbandState => edit(s, (d) => { d.campaign = { ...d.campaign, on: true, round: 1, districts: {} } as WarbandState['campaign']; });
+  const hero = (s: WarbandState) => s.models.find((x) => core.isHeroModel(ctx(s), x))!;
+
+  it('counts the gear a Robbed hero loses, and says nothing about it when nobody was robbed', () => {
+    const s = edit(campaign(warband()), (d) => { d.models.find((x) => core.isHeroModel(ctx(d), x))!.eq = { Schwert: 1, Dolch: 1 }; });
+    expect(core.stageMetrics(ctx(s))).toMatchObject({ lostGear: 0, lostRansom: 0, lostLocations: 0, lostTotal: 0, incomePit: 0 });
+    const t = core.addInjury(ctx(s), hero(s).uid, '36');
+    const m = core.stageMetrics(ctx(t));
+    expect(m.lostGear).toBe((t.campaign!.log as { data?: { gold?: number } }[]).filter((e) => e.data?.gold).reduce((n, e) => n - Number(e.data!.gold), 0));
+    expect(m.lostGear).toBeGreaterThan(0);
+    expect(m.lostTotal).toBe(m.lost + m.lostGear);
+    expect(m.lost).toBe(0);
+  });
+
+  it('counts a ransom, a won pit fight (as income) and a lost one (as gear lost)', () => {
+    const s = campaign(warband());
+    const won = core.stageMetrics(ctx(core.addInjury(ctx(s), hero(s).uid, '65', { pitWon: true })));
+    expect(won).toMatchObject({ incomePit: 50, lostGear: 0 });
+    expect(won.income).toBe(50);
+    const ransomed = core.stageMetrics(ctx(core.addInjury(ctx(s), hero(s).uid, '61', { ransom: 35 })));
+    expect(ransomed).toMatchObject({ lostRansom: 35, lostTotal: 35 });
+  });
+
+  it('counts the losses of a place on the Exploration chart', () => {
+    const s = edit(campaign(warband()), (d) => {
+      (d.campaign as { postbattle?: unknown }).postbattle = { 1: { finds: [{ id: 1, kind: 'gold', source: 'location:x', amount: -20, text: 'x' }, { id: 2, kind: 'gold', source: 'location:y', amount: 30, text: 'y' }] } };
+    });
+    expect(core.stageMetrics(ctx(s))).toMatchObject({ lostLocations: 20, incomeLocations: 30, lostTotal: 20 });
+  });
+});

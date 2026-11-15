@@ -34,6 +34,13 @@ export interface StageMetrics {
   incomeScenario: number;
   incomeGoods: number;
   incomeOther: number;
+  /** Gold lost without a death, by cause: gear stripped (Robbed, a lost pit fight), ransoms paid, losses at places and scenarios; and the total of all of them
+      with the Fallen's `lost`. Gold won in the Pits. Counted from the events that carry a cause, so only from the day they did. */
+  lostGear: number;
+  lostRansom: number;
+  lostLocations: number;
+  lostTotal: number;
+  incomePit: number;
   /** Upkeep paid to Hired Swords and Dramatis Personae, and the list worth of what the steps found (items). */
   upkeepPaid: number;
   lootValue: number;
@@ -74,6 +81,11 @@ export function stageMetrics(ctx: Ctx): StageMetrics {
   const incomeLocations = from((x) => x.startsWith('location:')), incomeScenario = from((x) => x === 'scenario');
   // bookings in the warband's favour that name no origin (adjustments by hand: rewards, booty); those with an origin are counted above
   const incomeOther = (s.ledger ?? []).filter((e) => e.kind === 'adjust' && num(e.amount) > 0 && !e.source).reduce((n, e) => n + num(e.amount), 0);
+  const events = (s.campaign?.log ?? []).filter((e) => typeof e.data?.cause === 'string');
+  const byCause = (...causes: string[]) => events.filter((e) => causes.includes(e.data!.cause as string)).reduce((n, e) => n + num(e.data!.gold), 0);
+  const lostGear = 0 - byCause('robbed', 'pit-lost'), lostRansom = 0 - byCause('ransom'), incomePit = byCause('pit-won');
+  const lostLocations = 0 - finds.filter((f) => (f.source.startsWith('location:') || f.source === 'scenario') && gold(f) < 0).reduce((n, f) => n + gold(f), 0);
+  const lostDeaths = (s.fallen ?? []).reduce((t, f) => t + num(f.lostValue), 0);
   const upkeepPaid = 0 - finds.filter((f) => f.source === 'upkeep').reduce((n, f) => n + gold(f), 0);
   const lootValue = finds.filter((f) => f.kind === 'item').reduce((n, f) => n + num(f.worth) * (num(f.qty) || 1), 0);
   return {
@@ -82,10 +94,10 @@ export function stageMetrics(ctx: Ctx): StageMetrics {
     stash,
     wealth: goldTreasury(ctx) + stash,
     exp, heroExp,
-    lost: (s.fallen ?? []).reduce((t, f) => t + num(f.lostValue), 0),
+    lost: lostDeaths, lostGear, lostRansom, lostLocations, lostTotal: lostDeaths + lostGear + lostRansom + lostLocations, incomePit,
     wyrd,
     wyrdFound: wyrd + sold.reduce((t, w) => t + num(w?.shards), 0),
-    income: incomeWyrd + incomeLocations + incomeScenario + incomeGoods + incomeOther, incomeWyrd, incomeLocations, incomeScenario, incomeGoods, incomeOther, upkeepPaid, lootValue,
+    income: incomeWyrd + incomeLocations + incomeScenario + incomeGoods + incomeOther + incomePit, incomeWyrd, incomeLocations, incomeScenario, incomeGoods, incomeOther, upkeepPaid, lootValue,
     spentBuy: book('buy', -1), spentSearch: book('search', -1),
     stashItems: (s.stash?.items ?? []).reduce((t, it) => t + (num(it.qty) || 1), 0),
     rareCarried: s.models.reduce((t, m) => t + Object.keys(m.rare ?? {}).length, 0),

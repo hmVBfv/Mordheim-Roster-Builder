@@ -370,7 +370,7 @@ export function addInjury(ctx: Ctx, uid: number, code: string, choices: InjuryCh
     const m = findModel(d, uid) as Model;
     if (j.code === '36') { // Robbed: all gear lost, no refund
       const lost = stripGearSettled(d, c, m, false);
-      logEvent(d, 'injury', `${nm} was Robbed — all equipment lost (${lost} gc, not refunded).`, { uid_def: m.uid_def });
+      logEvent(d, 'injury', `${nm} was Robbed — all equipment lost (${lost} gc, not refunded).`, { uid_def: m.uid_def, cause: 'robbed', gold: -lost });
       m.inj = m.inj || [];
       m.inj.push({ code: j.code, name: j.name, text: j.text, mod: null });
       return;
@@ -379,17 +379,17 @@ export function addInjury(ctx: Ctx, uid: number, code: string, choices: InjuryCh
       if (choices.pitWon !== false) {
         stashOf(d).gold = goldTreasury(c) + 50;
         m.exp = (Number(m.exp) || 0) + 2;
-        logEvent(d, 'injury', `${nm} won his pit fight — +50 gc, +2 XP.`, { uid_def: m.uid_def });
+        logEvent(d, 'injury', `${nm} won his pit fight — +50 gc, +2 XP.`, { uid_def: m.uid_def, cause: 'pit-won', gold: 50 });
       } else {
         const lost = stripGearSettled(d, c, m, true);
-        logEvent(d, 'injury', `${nm} lost his pit fight — weapons & armour lost (${lost} gc, not refunded). Roll 11–35 for injuries separately.`, { uid_def: m.uid_def });
+        logEvent(d, 'injury', `${nm} lost his pit fight — weapons & armour lost (${lost} gc, not refunded). Roll 11–35 for injuries separately.`, { uid_def: m.uid_def, cause: 'pit-lost', gold: -lost });
       }
       return;
     }
     if (j.code === '61') { // Captured and coming back
       const r = Math.max(0, Number(choices.ransom) || 0);
       if (r > 0) stashOf(d).gold = Math.max(0, goldTreasury(c) - r);
-      logEvent(d, 'injury', `${nm} was Captured and ${r > 0 ? `ransomed for ${r} gc` : 'exchanged'}.`, { uid_def: m.uid_def });
+      logEvent(d, 'injury', `${nm} was Captured and ${r > 0 ? `ransomed for ${r} gc` : 'exchanged'}.`, { uid_def: m.uid_def, ...(r > 0 ? { cause: 'ransom', gold: -r } : {}) });
       return;
     }
     if (j.code === '35') { // Deep Wound: misses the next D3 games

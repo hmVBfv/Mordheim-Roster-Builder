@@ -552,3 +552,12 @@ Eine Runde des Nachspiels (`campaign.postbattle[round]`) hält in core mehr fest
 kennt nichts davon und lässt es beim Laden und Speichern unberührt. **Der Vergleich der Parität lässt genau diese Schlüssel aus**
 (`CORE_ONLY_POSTBATTLE` in `core/test/support/canon.ts`, `campaign.perks`; nichts sonst). Das Verhalten von `sellWyrdstone` ohne Optionen ist
 das der alten App; bei geführtem Kassenbuch (nur core) ist der Verkauf eine Buchung mit Herkunft.
+
+## Goldverluste in der Statistik (P14, Rob, 14.11.2026)
+
+Ereignisse der Chronik, die Gold bewegen (Robbed, verlorener und gewonnener Pit-Kampf, Lösegeld), tragen in `data` zusätzlich `cause`
+(`robbed`, `pit-lost`, `pit-won`, `ransom`) und `gold` (Änderung, negativ bei Verlust); der Text ist derselbe wie in der alten App. Neu
+ist, dass das Lösegeld beim ersten Würfeln „Captured, ransomed" ein Chronik-Ereignis bekommt. Die Statistik (`stageMetrics`) rechnet daraus
+`lostGear`, `lostRansom`, `incomePit`, aus den Funden der Nachbereitung `lostLocations`, und `lostTotal` mit dem Verlust der Gefallenen.
+Marken von vorher tragen nur den Verlust der Gefallenen; ihr `lostTotal` ist dieser. **Der Vergleich der Parität lässt genau diese beiden
+Schlüssel und die Zeile des Lösegelds beim ersten Würfeln aus** (`CORE_ONLY_LOG_DATA` in `core/test/support/canon.ts`). Tests: `core/test/stats.test.ts`.
