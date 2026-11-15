@@ -429,7 +429,7 @@ mit Gold, einer mit Gegenständen, bei 360 px.
 
 ### N9 – Schritt 4 Wyrdstone: Preistabelle, Hauptbuch
 
-- [ ] erledigt · Sonderregeln entschieden (Abschnitt 5)
+- [x] erledigt (Branch `feat/postbattle-n9`; der Troll der Black Orcs bleibt eine Korrektur von Hand – die Wahl „20 gc Sold oder zählt als zwei“ steht nirgends im Spielstand) · Sonderregeln entschieden (Abschnitt 5)
 
 **Regel:** `…/docs/tools#4-sell-wyrdstone`, `…/docs/campaigns/income#selling-wyrdstone`
 (einmal je Nachspiel; Preis für das ganze Los nach Größe der Warband).

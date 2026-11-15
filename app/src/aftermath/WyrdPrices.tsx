@@ -5,9 +5,9 @@ import { RulesTable } from '../ui/RulesTable.tsx';
 import ui from '../ui/ui.module.css';
 import { wyrdPriceTable } from './tables.ts';
 
-export function WyrdPrices({ size = null, shards = null }: { size?: number | null; shards?: number | null }) {
+export function WyrdPrices({ size = null, shards = null, band = null }: { size?: number | null; shards?: number | null; band?: number | null }) {
   const t = wyrdPriceTable();
-  const col = size == null ? null : core.wyrdSizeBand(size) + 1;
+  const col = band != null ? band + 1 : size == null ? null : core.wyrdSizeBand(size) + 1;
   const row = shards == null ? null : Math.max(0, Math.min(core.WYRD_PRICE.length, shards) - 1);
   if (col == null) return <RulesTable caption={t.title} head={t.head} rows={t.rows} row={row} note={t.note} link={t.link} />;
   const own = { head: [t.head[0] as string, t.head[col] as string], rows: t.rows.map((r) => [r[0] as string, r[col] as string]) };

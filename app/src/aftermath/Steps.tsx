@@ -1,7 +1,6 @@
 /* The steps of the post-battle sequence (phase 4a4; N2 of docs/plan-postbattle.md): each step's body, the list of steps with its progress. */
 import * as core from '@mordheim/core';
 import type { GameData, WarbandState } from '@mordheim/core';
-import { useState } from 'react';
 import { Link } from 'react-router';
 import { RulesTable } from '../ui/RulesTable.tsx';
 import ui from '../ui/ui.module.css';
@@ -10,6 +9,7 @@ import { fromAftermath } from './back.ts';
 import { experienceTables, injuryTables, locationGroups, shardsTable, type TableData } from './tables.ts';
 import { ExperienceStep } from './ExperienceStep.tsx';
 import { ExplorationStep } from './ExplorationStep.tsx';
+import { WyrdStep } from './WyrdStep.tsx';
 import type { UnderdogView } from './underdog.ts';
 import type { AftermathView, CasualtyView } from './view.ts';
 import { WyrdPrices } from './WyrdPrices.tsx';
@@ -61,7 +61,6 @@ function Go({ text, links }: { text: string; links: [string, string][] }) {
 }
 
 function StepBody({ k, a, data, wid, acts }: { k: string; a: AftermathView; data: GameData; wid: string; acts: StepActs }) {
-  const [sell, setSell] = useState(a.wyrd.shards);
   const from = fromAftermath(a.local.serverId);
   const roster = `/warbands/${wid}`;
   switch (k) {
@@ -76,35 +75,7 @@ function StepBody({ k, a, data, wid, acts }: { k: string; a: AftermathView; data
     );
     case 'experience': return <ExperienceStep a={a} data={data} acts={acts} underdog={acts.underdog} rosterLink={`${roster}${from}`} />;
     case 'exploration': return <ExplorationStep a={a} data={data} acts={acts} />;
-    case 'wyrdstone': {
-      const n = Math.max(1, Math.min(a.wyrd.shards, sell || a.wyrd.shards));
-      return (
-        <>
-          <p>Wyrdstone is sold once after each battle. The price is for the whole lot, not per shard – smaller lots fetch more each, and a larger warband earns less.</p>
-          {a.wyrd.sold
-            ? (
-              <div className={ui.row}>
-                <span>✓ Sold {a.wyrd.sold.shards} shard{a.wyrd.sold.shards === 1 ? '' : 's'} for {a.wyrd.sold.gc} gc (warband of {a.wyrd.sold.size}).</span>
-                <button type="button" className={ui.buttonQuiet} onClick={() => acts.edit((c) => core.undoWyrdstoneSale(c, a.round), 'Sale taken back.')}>Take the sale back</button>
-              </div>
-            )
-            : a.wyrd.shards < 1
-              ? <p className={ui.muted}>No wyrdstone in the stash to sell.</p>
-              : (
-                <>
-                  <p>Stash: {a.wyrd.shards} shard{a.wyrd.shards === 1 ? '' : 's'} · warband of {a.wyrd.size} (band {a.wyrd.band}).</p>
-                  <div className={styles.stepper}>
-                    <span>Sell</span>
-                    <button type="button" className={ui.buttonQuiet} aria-label="Sell one shard less" disabled={n <= 1} onClick={() => setSell(n - 1)}>−</button>
-                    <span aria-live="polite">{n}</span>
-                    <button type="button" className={ui.buttonQuiet} aria-label="Sell one shard more" disabled={n >= a.wyrd.shards} onClick={() => setSell(n + 1)}>+</button>
-                    <button type="button" className={ui.button} onClick={() => acts.edit((c) => core.sellWyrdstone(c, a.round, n), `Sold ${n} shard${n === 1 ? '' : 's'} for ${a.wyrd.price(n)} gc.`)}>Sell for {a.wyrd.price(n)} gc</button>
-                  </div>
-                </>
-              )}
-        </>
-      );
-    }
+    case 'wyrdstone': return <WyrdStep a={a} data={data} acts={acts} />;
     case 'veterans': return <Go text="Roll 2D6: new recruits may bring experience up to that total between them." links={[[`${roster}/hire${from}`, 'Hire']]} />;
     case 'rare': return <Go text="A Hero not taken out of action may look for one rare item: 2D6 against its rarity. What he finds is bought at the Trading Post." links={[[`${roster}/trade${from}`, 'Trading Post']]} />;
     case 'dramatis': return <Go text="A Dramatis Persona may be found, if the warband may hire one and can pay." links={[[`${roster}/hire${from}`, 'Hire']]} />;

@@ -150,6 +150,14 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   Ein Ort je Runde. `undoLocation` nimmt alles zurück (nicht den Tod eines Helden: das macht das Rückgängig des Editors).
   Perks mit `explore` erscheinen in `exploreAllowances` als `perk:<id>`: der Eingang zu den Katakomben (`unique`) gibt jedes Mal eine
   Wiederholung, der Einblick des Streuners einmal einen Würfel mehr (`used`).
+
+  **Verkauf von Wyrdstone und Treasure (N9):** `sellingSize(ctx, { kind, chef?, victuals?, manual? })` gibt die Größe, bei der der Preis
+  gelesen wird: Ogres der Maneaters zählen doppelt (`large`), ein Mob (`mob: true` an der Einheit) als ein Modell, der Halfling Cook
+  (Master Chef, ein W6 von 5+) senkt die Preisstufe um eine, Victuals nur bei Treasure je Stück um eine (nie unter 1–3), dazu eine
+  Korrektur von Hand – jede Anpassung steht in `lines`. `priceAt` liest die Tabelle, `merchantAdjust` rechnet den Wurf des Cathayan
+  Merchant ein. `sellWyrdstone(ctx, round, shards, { size?, adjust? })` bucht mit geführtem Kassenbuch eine Buchung `adjust` mit
+  `source: 'wyrdstone'`, hält `wyrd: { …, band?, adjust? }` und einen Fund mit Herkunft `wyrdstone` fest; `undoWyrdstoneSale` macht alles
+  rückgängig. Ohne Optionen verkauft es wie die alte App.
 - **Kampagnendatei** (eigenes Dokument, Quick Build): `{ type:
   'mordheim-campaign-file', version: 1, name, round, warbands: [{ id, player,
   name, wb, updated, roster }], battles: [...], log: [...] }`. `roster` ist
