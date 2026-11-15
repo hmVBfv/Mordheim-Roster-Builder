@@ -11,12 +11,12 @@
   ["Scenario", "varies", "Many scenarios give more (objectives, wyrdstone carried off …) — see the scenario."]
  ],
  "PB_HERO_ADVANCE": [
-  ["2–5", "New skill", "Choose a skill from one of the Hero's skill lists."],
+  ["2–5", "New skill or random spell", "Choose a skill from one of the Hero's skill lists. A wizard may instead generate a new spell at random."],
   ["6", "+1 S or +1 A", "Roll a D6: 1–3 +1 Strength, 4–6 +1 Attack."],
   ["7", "+1 WS or +1 BS", "Choose one."],
   ["8", "+1 I or +1 Ld", "Roll a D6: 1–3 +1 Initiative, 4–6 +1 Leadership."],
   ["9", "+1 W or +1 T", "Roll a D6: 1–3 +1 Wound, 4–6 +1 Toughness."],
-  ["10–12", "New skill", "Choose a skill from one of the Hero's skill lists."]
+  ["10–12", "New skill or random spell", "Choose a skill from one of the Hero's skill lists. A wizard may instead generate a new spell at random."]
  ],
  "PB_HENCH_ADVANCE": [
   ["2–4", "+1 Initiative", ""],

@@ -21,12 +21,12 @@ export interface AdvRow {
 
 /* Rulebook, Experience – Advances (mordheimer.net, Campaigns – Experience). */
 export const HERO_TABLE: AdvRow[] = [
-  { from: 2, to: 5, label: 'New skill', kind: 'skill' },
+  { from: 2, to: 5, label: 'New skill or random spell', kind: 'skill', how: 'Pick a skill from one of his skill lists. A wizard may instead generate a new spell at random.' },
   { from: 6, to: 6, label: '+1 Strength or +1 Attack', kind: 'stat', stats: ['S', 'A'], d6: true, how: 'Roll a D6: 1–3 Strength, 4–6 Attack.' },
   { from: 7, to: 7, label: '+1 Weapon Skill or +1 Ballistic Skill', kind: 'stat', stats: ['WS', 'BS'], how: 'Choose one.' },
   { from: 8, to: 8, label: '+1 Initiative or +1 Leadership', kind: 'stat', stats: ['I', 'Ld'], d6: true, how: 'Roll a D6: 1–3 Initiative, 4–6 Leadership.' },
   { from: 9, to: 9, label: '+1 Wound or +1 Toughness', kind: 'stat', stats: ['W', 'T'], d6: true, how: 'Roll a D6: 1–3 Wound, 4–6 Toughness.' },
-  { from: 10, to: 12, label: 'New skill', kind: 'skill' },
+  { from: 10, to: 12, label: 'New skill or random spell', kind: 'skill', how: 'Pick a skill from one of his skill lists. A wizard may instead generate a new spell at random.' },
 ];
 
 export const HENCH_TABLE: AdvRow[] = [

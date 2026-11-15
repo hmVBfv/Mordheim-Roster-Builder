@@ -5,6 +5,7 @@ import * as core from '@mordheim/core';
 import { useState } from 'react';
 import ui from '../ui/ui.module.css';
 import styles from './Aftermath.module.css';
+import { RollDuties } from './RollDuties.tsx';
 import type { AftermathView } from './view.ts';
 
 export interface DutyActs {
@@ -100,11 +101,13 @@ function Duty({ d, ctx, acts, round }: { d: core.DutyLine; ctx: core.Ctx; acts: 
 
 export function DutiesStep({ a, acts }: { a: AftermathView; acts: DutyActs }) {
   const due = core.dutiesDue(acts.ctx, a.round);
+  const rolls = core.rollDutiesDue(acts.ctx, a.round);
   return (
     <>
-      {due.length > 0 && <p>Some warbands have a rule that asks for a choice after each battle. Settle it here, before you hire or buy: what you choose has consequences – gold, the warband’s size, who stays.</p>}
+      {(due.length > 0 || rolls.length > 0) && <p>Some warbands have a rule that asks for a choice after each battle. Settle it here, before you hire or buy: what you choose has consequences – gold, the warband’s size, who stays.</p>}
       {due.map((d) => <Duty key={d.id} d={d} ctx={acts.ctx} acts={acts} round={a.round} />)}
       {due.some((d) => !d.resolved) && <p className={styles.warn}>{due.filter((d) => !d.resolved).length} still to settle.</p>}
+      {rolls.length > 0 && <RollDuties lines={rolls} acts={acts} round={a.round} />}
     </>
   );
 }

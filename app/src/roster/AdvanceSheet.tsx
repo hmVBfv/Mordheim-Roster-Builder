@@ -163,6 +163,15 @@ function Body({ v, close, onApply, titleId }: { v: AdvanceView; close: Sheet['cl
                   </div>
                 ))}
                 {kind === 'spell' && v.spells && (
+                  <button type="button" className={ui.buttonQuiet} onClick={() => {
+                    // the spell is generated at random (rulebook); a known one is rolled again and gets easier to cast
+                    const items = v.spells!.items;
+                    const buf = new Uint32Array(1); crypto.getRandomValues(buf);
+                    const s = items[buf[0]! % items.length]!;
+                    setPick(s.known ? `reduce:${s.key}` : `spell:${s.key}`);
+                  }}>Draw a spell at random</button>
+                )}
+                {kind === 'spell' && v.spells && (
                   <div className={styles.skillGroup} role="group" aria-label={v.spells.lore}>
                     <ul className={styles.pickGrid}>
                       {v.spells.items.map((s) => (

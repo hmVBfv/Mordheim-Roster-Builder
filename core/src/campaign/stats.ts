@@ -80,7 +80,8 @@ export function stageMetrics(ctx: Ctx): StageMetrics {
   const incomeWyrd = recordedSales + unrecordedSales, incomeGoods = book('sell', 1);
   const incomeLocations = from((x) => x.startsWith('location:')), incomeScenario = from((x) => x === 'scenario');
   // bookings in the warband's favour that name no origin (adjustments by hand: rewards, booty); those with an origin are counted above
-  const incomeOther = (s.ledger ?? []).filter((e) => e.kind === 'adjust' && num(e.amount) > 0 && !e.source).reduce((n, e) => n + num(e.amount), 0);
+  const incomeDuties = from((x) => x.startsWith('duty:')); // gold a rule of the warband brings (Slick Operator)
+  const incomeOther = incomeDuties + (s.ledger ?? []).filter((e) => e.kind === 'adjust' && num(e.amount) > 0 && !e.source).reduce((n, e) => n + num(e.amount), 0);
   const events = (s.campaign?.log ?? []).filter((e) => typeof e.data?.cause === 'string');
   const byCause = (...causes: string[]) => events.filter((e) => causes.includes(e.data!.cause as string)).reduce((n, e) => n + num(e.data!.gold), 0);
   const lostGear = 0 - byCause('robbed', 'pit-lost'), lostRansom = 0 - byCause('ransom'), incomePit = byCause('pit-won');
