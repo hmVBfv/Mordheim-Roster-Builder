@@ -353,7 +353,7 @@ durch den Elf Ranger) lässt sich so nachspielen; Changelog.
 
 ### N7 – Erkundung: die 30 Orte als Daten und Rechner
 
-- [ ] erledigt · Warband-Zweige entschieden (Abschnitt 5), Liste der dämonenartigen Warbands vorlegen
+- [x] erledigt (Branch `feat/postbattle-n7`; `demonic` ist für Possessed und Carnival gesetzt – Rob bestätigt die Liste in der PR-Beschreibung) · Warband-Zweige entschieden (Abschnitt 5), Liste der dämonenartigen Warbands vorlegen
 
 **Regel:** `…/docs/campaigns/income#exploration-chart` und die 30 Abschnitte
 darunter, dazu `#magical-artefacts-table`. Volltext lesen, nicht die Kurzform.

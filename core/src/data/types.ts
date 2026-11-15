@@ -99,6 +99,8 @@ export interface WarbandDef {
   grade: string;
   /** The race mordheimer.net lists the warband under (Human, Undead, Chaos Human/Demon …); not the stat race of WBRACE. */
   siteRace?: string;
+  /** Demon-like (Rob, 14.11.2026: the Possessed and the Carnival): the places of the Exploration chart that ask for "Possessed" mean these. */
+  demonic?: boolean;
   min: number;
   max: number;
   gold?: number;
@@ -218,6 +220,8 @@ export interface HireEntry {
   grade: string;
   /** The race mordheimer.net lists the warband under (Human, Undead, Chaos Human/Demon …); not the stat race of WBRACE. */
   siteRace?: string;
+  /** Demon-like (Rob, 14.11.2026: the Possessed and the Carnival): the places of the Exploration chart that ask for "Possessed" mean these. */
+  demonic?: boolean;
   src?: string;
   hire?: number;
   upkeep?: number;
@@ -388,6 +392,10 @@ export interface GameData {
   /* What skills, items, Hired Swords and districts change in the exploration roll (N6): extra dice, re-rolls, +/-1, dice to discard. */
   PB_EXPLORE_RULES: ExploreRule[];
   /* The mentions of exploration in the data that PB_EXPLORE_RULES does not model: a lower-case piece of the sentence and the reason. A test finds every mention in the data and wants it in one list or the other. */
+  /* The thirty places of the Exploration chart as steps (N7): questions to the player (rolls, tests, choices) and what each answer brings. */
+  PB_LOCATION_RULES: Record<string, Record<string, unknown>[]>;
+  /* The magical artefacts table: [name, what it does]; a D6 picks one. */
+  PB_ARTEFACTS: [name: string, text: string][];
   PB_EXPLORE_EXCEPTIONS: [needle: string, why: string][];
   /* Animals and creatures for leaders' opponent profiles (data/bestiary.json;
      the new app only – legacy does not load the file). */
@@ -430,6 +438,8 @@ export interface BeastDef {
   grade: string;
   /** The race mordheimer.net lists the warband under (Human, Undead, Chaos Human/Demon …); not the stat race of WBRACE. */
   siteRace?: string;
+  /** Demon-like (Rob, 14.11.2026: the Possessed and the Carnival): the places of the Exploration chart that ask for "Possessed" mean these. */
+  demonic?: boolean;
   profile: Profile;
   sv?: string;
   equipment?: string;

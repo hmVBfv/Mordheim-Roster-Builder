@@ -132,6 +132,15 @@ und ist zugleich der Inhalt einer Version. Erweiterungen:
   hat; `recordExploration` bekommt `used` (Ids, je höchstens einmal), und `explore.used` hält sie fest. `PB_EXPLORE_EXCEPTIONS` nennt
   jede Erwähnung der Erkundung in den Daten, die nicht abgebildet ist, mit Grund; `core/test/explore-allowances.test.ts` liest die Daten
   und verlangt für jeden Satz über die Erkundung einen Eintrag in der einen oder der anderen Liste (und meldet veraltete Einträge).
+
+  **Die dreißig Orte (N7):** `PB_LOCATION_RULES` (`data/postbattle.json`, Schlüssel wie `PB_LOCATIONS`, z. B. `'5 5 5'`) beschreibt jeden Ort
+  als Schritte: Fragen an den Spieler (`q`: `roll` mit Würfeln und Tabelle, `pass` für einen Test, `hero`, `choice`), `do` (Gold,
+  Splitter, Gegenstände aus dem Katalog, Edelsteine, Erfahrung, Dauerhaftes `perk`, Hinweise, `miss`/`lose` für einen Helden),
+  `by` (Zweige nach Warband-Merkmal: Skaven, Possessed, Undead, Sisters, Witch Hunters, sonst `else`), `if` und `each` (je ein Wurf „4+“).
+  `resolveLocation(ctx, key, answers)` geht die Schritte mit den bisherigen Antworten durch und gibt die nächste Frage oder – wenn alles
+  beantwortet ist – die Funde (`LocFind`) und Dauerhaftes (`LocPerk`); es würfelt nie. Der Katalog der sechs magischen Artefakte steht in
+  `PB_ARTEFACTS`. Warband-Merkmale: Undead = `siteRace` „Undead“ (ein Vampir ist es nicht), Skaven = `siteRace` „Skaven“, Possessed =
+  das neue Merkmal `demonic` im Warband-Kopf (heute Possessed und Carnival).
 - **Kampagnendatei** (eigenes Dokument, Quick Build): `{ type:
   'mordheim-campaign-file', version: 1, name, round, warbands: [{ id, player,
   name, wb, updated, roster }], battles: [...], log: [...] }`. `roster` ist
